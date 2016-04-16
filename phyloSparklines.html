@@ -9,22 +9,6 @@
 
 <body></body>
 
-<script type = "text/javascript">
-  width = 500;
-  height = 250;
-
-  tree_cluster = get_node_cluster(tree, width, height);
-
-  svg_elem = d3.select("body")
-  .append("svg")
-  .attr({"width": width,
-  "height": height});
-
-  paddings = {"y_top": 25, "y_bottom": 25, "x_right": 25, "x_left": 25};
-  scales = get_scales(height, width, paddings);
-
-  draw_links(svg_elem, tree_cluster["links"], scales);
-  draw_nodes(svg_elem, tree_cluster["nodes"], scales);
-</script>
+<script type = "text/javascript" src="vis/setup.js"></script>
 
 </html>
