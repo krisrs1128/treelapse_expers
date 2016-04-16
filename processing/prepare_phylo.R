@@ -101,6 +101,25 @@ res <- tree_json(el, "1")
 sprintf("var tree = %s", toJSON(res, auto_unbox = T)) %>%
   cat(file = file.path("data", "tree.js"))
 
+# create json object representing time series
+mX <- data.table(X, Z) %>%
+  melt(id.vars = c("subject", "date")) %>%
+  group_by(subject, date, variable) %>%
+  summarise(count = sum(value)) %>%
+  arrange(variable, date) %>%
+  dlply(.(subject), function(x) {
+    x$subject <- NULL
+    z <- dcast(x, date ~ variable, value = "count")
+    time <- z$date
+    z$date <- NULL
+    apply(z, 2, function(x) {
+      data.frame(time, value = x)
+    } )
+  })
+
+sprintf("var ts = %s", toJSON(mX)) %>%
+  cat(file = file.path("data", "abund_ts.js"))
+
 # Tidy things up ---------------------------------------------------------------
 cat("\014")  # Clear console
 
