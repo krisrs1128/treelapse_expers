@@ -50,7 +50,7 @@ colnames(Z) <- c("date", "subject")
 Z <- Z[Z$subject %in% c("10043", "10040", "10032"), ]
 
 Z$date <- strptime(Z$date, "%m/%d/%y %H:%M")
-Z$date <- paste(month(Z$date), year(Z$date), sep = "-")
+Z$date <- paste(month(Z$date), "01", year(Z$date), sep = "-")
 Z$date <- as.factor(Z$date)
 X <- otu_table(PS) %>%
   data.frame(check.names = F)
@@ -110,14 +110,14 @@ mX <- data.table(X, Z) %>%
   dlply(.(subject), function(x) {
     x$subject <- NULL
     z <- dcast(x, date ~ variable, value = "count")
-    time <- z$date
+    time <- strptime(z$date, "%m-%d-%Y")
     z$date <- NULL
     apply(z, 2, function(x) {
-      data.frame(time, value = x)
-    } )
+      data.frame(time = time[order(time)], value = x[order(time)])
+    })
   })
 
-sprintf("var ts = %s", toJSON(mX)) %>%
+sprintf("var abund_ts = %s", toJSON(mX)) %>%
   cat(file = file.path("data", "abund_ts.js"))
 
 # Tidy things up ---------------------------------------------------------------
