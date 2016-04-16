@@ -4,17 +4,17 @@
 
 # Setup packages ---------------------------------------------------------------
 # List of packages for session
-.packages = c("data.table",
-              "plyr",
-              "phangorn",
-              "jsonlite",
-              "phyloseq",
-              "dplyr")
+.packages  <-  c("data.table",
+                 "plyr",
+                 "phangorn",
+                 "jsonlite",
+                 "phyloseq",
+                 "dplyr")
 
 # Install CRAN packages (if not already installed)
 .inst <- .packages %in% installed.packages()
 if(any(!.inst)) {
-  install.packages(.packages[!.inst], repos='http://cran.rstudio.com/')
+  install.packages(.packages[!.inst], repos = "http://cran.rstudio.com/")
 }
 
 # Load packages into session 
@@ -46,24 +46,25 @@ PS <- PS %>% subset_taxa(Genus == "Ruminococcus")
 ## --- sample data ----
 Z <- sample_data(PS)[, c("DateColl", "SubjectID")] %>%
   data.frame(check.names = F)
-Z <- Z[Z$SubjectID %in% c("10043", "10040", "10032"), ]
+colnames(Z) <- c("date", "subject")
+Z <- Z[Z$subject %in% c("10043", "10040", "10032"), ]
 
-Z$DateColl <- strptime(Z$DateColl, "%m/%d/%y %H:%M")
-Z$DateColl <- paste(month(Z$DateColl), year(Z$DateColl), sep = "-")
-Z$DateColl <- as.factor(Z$DateColl)
+Z$date <- strptime(Z$date, "%m/%d/%y %H:%M")
+Z$date <- paste(month(Z$date), year(Z$date), sep = "-")
+Z$date <- as.factor(Z$date)
 X <- otu_table(PS) %>%
   data.frame(check.names = F)
 X <- X[rownames(X) %in% rownames(Z), ]
 
 # get counts at different levels in the tree associated with the first sample
-Z$SubjectID <- droplevels(Z$SubjectID)
-Z$DateColl <- droplevels(Z$DateColl)
+Z$subject <- droplevels(Z$subject)
+Z$date <- droplevels(Z$date)
 
 phy_tree(PS)$node.label <- seq_along(phy_tree(PS)$node.label)
 phy_names <- c(phy_tree(PS)$node.label, phy_tree(PS)$tip.label)
 
-unique_dates <- unique(Z$DateColl)
-unique_subjects <- unique(Z$SubjectID)
+unique_dates <- unique(Z$date)
+unique_subjects <- unique(Z$subject)
 abund <- replicate(length(unique_dates),
                    matrix(0, nrow = length(phy_names),
                           ncol = length(unique_subjects),
@@ -73,8 +74,8 @@ abund <- replicate(length(unique_dates),
 for (i in seq_along(unique_dates)) {
   cat(sprintf("Processing time %s\n", unique_dates[i]))
   for(j in seq_along(unique_subjects)) {
-    cur_subject_ix <- which(Z$SubjectID %in% unique_subjects[j] &
-                              Z$DateColl %in% unique_dates[i])
+    cur_subject_ix <- which(Z$subject %in% unique_subjects[j] &
+                              Z$date %in% unique_dates[i])
     cur_X <- colSums(X[cur_subject_ix, ])
     counts <- tree_counts(phy_tree(PS), unlist(cur_X))
     counts <- setNames(counts$count, counts$label)
@@ -84,7 +85,7 @@ for (i in seq_along(unique_dates)) {
 
 names(abund) <- unique_dates
 abund <- lapply(abund, function(x) {
-  as.list(data.frame(t(x)))
+  as.list(data.frame(t(x), check.names = F))
 })
 
 sprintf("var abund = %s", toJSON(abund)) %>%
