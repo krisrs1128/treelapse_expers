@@ -16,19 +16,22 @@ function get_scales(height, width, paddings) {
 		.range([paddings.y_top, height - paddings.y_bottom]),
 		"edge": d3.scale.linear()
 		.domain([0, 200])
-		.range([0.5, 5])
+		.range([0.5, 5]),
+		"r": d3.scale.linear()
+		.domain([0, 200])
+		.range([.5, 5])
 	       };
   return scales;
 }
 
-function draw_nodes(svg_elem, nodes, scales) {
+function draw_nodes(svg_elem, node_data, scales) {
   svg_elem.selectAll("circle")
-    .data(nodes).enter()
+    .data(node_data).enter()
     .append("circle")
     .classed("node", true)
     .attr({"cx": function(d) { return scales.x(d.y); },
 	   "cy": function(d) { return scales.y(d.x); },
-	   "r": 2});
+	   "r": function(d) { return scales.r(d.abund); }});
 }
 
 function extract_link_pos(links) {
@@ -44,18 +47,24 @@ function extract_link_pos(links) {
 
 function get_link_data(links, abund) {
   var link_pos = extract_link_pos(links, abund);
-  var link_data = insert_abund_data(link_pos, abund);
+  var link_data = insert_link_abund(link_pos, abund);
   return link_data;
 }
 
-
-function insert_abund_data(link_pos, abund) {
+function insert_link_abund(link_pos, abund) {
   // only need to insert abundance information for the target
   link_data = link_pos;
   for (var i = 0; i < link_pos.length; i++) {
     link_data[i][1].abund = abund[link_pos[i][1].name];
   }
   return link_data;
+}
+
+function insert_node_abund(nodes, abund) {
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].abund = abund[nodes[i].name];
+  }
+  return nodes;
 }
 
 function draw_links(svg_elem, link_data, scales) {

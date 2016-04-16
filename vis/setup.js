@@ -18,5 +18,6 @@ for (var otu_id in cur_abund) {
 }
 
 link_data = get_link_data(tree_cluster["links"], cur_abund); // displaying abundance at time 0
+node_data = insert_node_abund(tree_cluster["nodes"], cur_abund);
 draw_links(svg_elem, link_data, scales);
 draw_nodes(svg_elem, tree_cluster["nodes"], scales);
