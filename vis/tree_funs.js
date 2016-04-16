@@ -13,7 +13,10 @@ function get_scales(height, width, paddings) {
 		.range([paddings.x_left, width - paddings.x_right]),
 		"y": d3.scale.linear()
 		.domain([0, height])
-		.range([paddings.y_top, height - paddings.y_bottom])
+		.range([paddings.y_top, height - paddings.y_bottom]),
+		"edge": d3.scale.linear()
+		.domain([0, 200])
+		.range([0.5, 5])
 	       };
   return scales;
 }
@@ -65,6 +68,7 @@ function draw_links(svg_elem, link_data, scales) {
     .data(link_data).enter()
     .append("path")
     .classed("link", true)
-    .attr({"d": lineFun});
+    .attr({"d": lineFun})
+    .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 }
 
