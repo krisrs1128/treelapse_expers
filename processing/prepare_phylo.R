@@ -96,7 +96,7 @@ el <- data.frame(phy_tree(PS)[["edge"]], phy_tree(PS)[["edge.length"]])
 el[, 1] <- phy_names[el[, 1]]
 el[, 2] <- phy_names[el[, 2]]
 colnames(el) <- c("parent", "child", "length")
-res <- tree_json(el, "0.930.581")
+res <- tree_json(el, "1")
 sprintf("var tree = %s", toJSON(res, auto_unbox = T)) %>%
   cat(file = file.path("data", "tree.js"))
 
