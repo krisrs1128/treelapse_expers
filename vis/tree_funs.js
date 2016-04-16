@@ -31,21 +31,38 @@ function draw_nodes(svg_elem, nodes, scales) {
 function extract_link_pos(links) {
   var link_pos = [];
   for (var i = 0; i < links.length; i++) {
-    link_pos.push([{"x": links[i].source.x, "y": links[i].source.y},
-		   {"x": links[i].target.x, "y": links[i].target.y}]);
+    link_pos.push([{"x": links[i].source.x, "y": links[i].source.y,
+		    "name": links[i].source.name},
+		   {"x": links[i].target.x, "y": links[i].target.y,
+		    "name": links[i].target.name}]);
   }
   return link_pos;
 }
 
-function draw_links(svg_elem, links, scales) {
+function get_link_data(links, abund) {
+  var link_pos = extract_link_pos(links, abund);
+  var link_data = insert_abund_data(link_pos, abund);
+  return link_data;
+}
+
+
+function insert_abund_data(link_pos, abund) {
+  // only need to insert abundance information for the target
+  link_data = link_pos;
+  for (var i = 0; i < link_pos.length; i++) {
+    link_data[i][1].abund = abund[link_pos[i][1].name];
+  }
+  return link_data;
+}
+
+function draw_links(svg_elem, link_data, scales) {
   var lineFun = d3.svg.line()
       .x(function(d) { return scales.x(d.y); })
       .y(function(d) { return scales.y(d.x); })
       .interpolate("step-before");
-  var link_pos = extract_link_pos(links);
 
   svg_elem.selectAll("path")
-    .data(link_pos).enter()
+    .data(link_data).enter()
     .append("path")
     .classed("link", true)
     .attr({"d": lineFun});
