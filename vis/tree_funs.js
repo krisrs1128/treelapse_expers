@@ -19,7 +19,7 @@ function get_scales(height, width, paddings) {
 		.range([0.5, 5]),
 		"r": d3.scale.linear()
 		.domain([0, 200])
-		.range([.5, 5])
+		.range([0, 5])
 	       };
   return scales;
 }
@@ -34,30 +34,12 @@ function draw_nodes(svg_elem, node_data, scales) {
 	   "r": function(d) { return scales.r(d.abund); }});
 }
 
-function extract_link_pos(links) {
-  var link_pos = [];
-  for (var i = 0; i < links.length; i++) {
-    link_pos.push([{"x": links[i].source.x, "y": links[i].source.y,
-		    "name": links[i].source.name},
-		   {"x": links[i].target.x, "y": links[i].target.y,
-		    "name": links[i].target.name}]);
-  }
-  return link_pos;
-}
-
-function get_link_data(links, abund) {
-  var link_pos = extract_link_pos(links, abund);
-  var link_data = insert_link_abund(link_pos, abund);
-  return link_data;
-}
-
-function insert_link_abund(link_pos, abund) {
+function insert_link_abund(links, abund) {
   // only need to insert abundance information for the target
-  link_data = link_pos;
-  for (var i = 0; i < link_pos.length; i++) {
-    link_data[i][1].abund = abund[link_pos[i][1].name];
+  for (var i = 0; i < links.length; i++) {
+    links[i].target.abund = abund[links[i].target.name];
   }
-  return link_data;
+  return links;
 }
 
 function insert_node_abund(nodes, abund) {
@@ -67,17 +49,18 @@ function insert_node_abund(nodes, abund) {
   return nodes;
 }
 
-function draw_links(svg_elem, link_data, scales) {
+function draw_links(svg_elem, links, scales) {
   var lineFun = d3.svg.line()
       .x(function(d) { return scales.x(d.y); })
       .y(function(d) { return scales.y(d.x); })
       .interpolate("step-before");
 
+  link_array = links.map(function(x) { return [x.source, x.target]; });
+
   svg_elem.selectAll("path")
-    .data(link_data).enter()
+    .data(link_array).enter()
     .append("path")
     .classed("link", true)
     .attr({"d": lineFun})
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 }
-
