@@ -1,6 +1,8 @@
 width = 200;
 height = 300;
 
+abund_ts["10032"] = parse_times(abund_ts["10032"])
+
 tree_cluster = get_node_cluster(tree, width, height);
 
 svg_elem = d3.select("body")
