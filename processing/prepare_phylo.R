@@ -30,11 +30,6 @@ graphics.off() # Close all open plots
 ## ---- funs ----
 source(file.path("processing", "tree_funs.R"))
 
-tree_counts_wrapper <- function(variable, value) {
-  counts <- setNames(value, variable)
-  data.frame(tree_counts(phy_tree(PS), counts))
-}
-
 ## ---- get-data ----
 pregnancy_path <- "http://statweb.stanford.edu/~susan/papers/Pregnancy/PregnancyClosed15.Rdata"
 tmp <- tempfile()
@@ -65,30 +60,38 @@ phy_names <- c(phy_tree(PS)$node.label, phy_tree(PS)$tip.label)
 
 unique_dates <- unique(Z$date)
 unique_subjects <- unique(Z$subject)
-abund <- replicate(length(unique_dates),
+abund <- replicate(length(unique_subjects),
                    matrix(0, nrow = length(phy_names),
-                          ncol = length(unique_subjects),
-                          dimnames = list(phy_names, unique_subjects)),
+                          ncol = length(unique_dates),
+                          dimnames = list(phy_names, unique_dates)),
                    simplify = FALSE)
     
-for (i in seq_along(unique_dates)) {
-  cat(sprintf("Processing time %s\n", unique_dates[i]))
-  for(j in seq_along(unique_subjects)) {
-    cur_subject_ix <- which(Z$subject %in% unique_subjects[j] &
-                              Z$date %in% unique_dates[i])
-    cur_X <- colSums(X[cur_subject_ix, ])
+for (i in seq_along(unique_subjects)) {
+  cat(sprintf("Processing subject %s\n", unique_subjects[i]))
+  for(j in seq_along(unique_dates)) {
+    cur_ix <- which(Z$subject %in% unique_subjects[i] &
+                              Z$date %in% unique_dates[j])
+    cur_X <- colSums(X[cur_ix, ])
     counts <- tree_counts(phy_tree(PS), unlist(cur_X))
     counts <- setNames(counts$count, counts$label)
     abund[[i]][ , j] <- counts[match(rownames(abund[[i]]), names(counts))]
   }
 }
 
-names(abund) <- unique_dates
-abund <- lapply(abund, function(x) {
-  as.list(data.frame(t(x), check.names = F))
-})
+names(abund) <- unique_subjects
+abund <- abund %>% lapply(
+  function(z) {
+    result <- list()
+    for (i in seq_len(nrow(z))) {
+      result[[i]] <- data.frame(time = colnames(z), value = z[i, ])
+      rownames(result[[i]]) <- NULL
+    }
+    names(result) <- rownames(z)
+    return (result)
+  }
+)
 
-sprintf("var abund = %s", toJSON(abund)) %>%
+sprintf("var abund = %s", toJSON(abund, auto_unbox = T)) %>%
   cat(file = file.path("data", "abund.js"))
 
 # create a json object representing edges
@@ -100,25 +103,6 @@ colnames(el) <- c("parent", "child", "length")
 res <- tree_json(el, "1")
 sprintf("var tree = %s", toJSON(res, auto_unbox = T)) %>%
   cat(file = file.path("data", "tree.js"))
-
-# create json object representing time series
-mX <- data.table(X, Z) %>%
-  melt(id.vars = c("subject", "date")) %>%
-  group_by(subject, date, variable) %>%
-  summarise(count = sum(value)) %>%
-  arrange(variable, date) %>%
-  dlply(.(subject), function(x) {
-    x$subject <- NULL
-    z <- dcast(x, date ~ variable, value = "count")
-    time <- strptime(z$date, "%m-%d-%Y")
-    z$date <- NULL
-    apply(z, 2, function(x) {
-      data.frame(time = time[order(time)], value = x[order(time)])
-    })
-  })
-
-sprintf("var abund_ts = %s", toJSON(mX)) %>%
-  cat(file = file.path("data", "abund_ts.js"))
 
 # Tidy things up ---------------------------------------------------------------
 cat("\014")  # Clear console
