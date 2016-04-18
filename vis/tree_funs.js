@@ -7,18 +7,18 @@ function get_node_cluster(tree, width, height) {
   return {"cluster": cluster, "nodes": nodes, "links": links};
 }
 
-function get_scales(height, width, paddings) {
+function get_scales(data_extent, vis_extent, paddings) {
   var scales = {"x": d3.scale.linear()
-		.domain([0, width])
-		.range([paddings.x_left, width - paddings.x_right]),
+		.domain([0, data_extent.x])
+		.range([paddings.x_left, vis_extent.width - paddings.x_right]),
 		"y": d3.scale.linear()
-		.domain([0, height])
-		.range([paddings.y_top, height - paddings.y_bottom]),
+		.domain([0, data_extent.y])
+		.range([paddings.y_top, vis_extent.height - paddings.y_bottom]),
 		"edge": d3.scale.linear()
-		.domain([0, 200])
+		.domain([0, data_extent.y])
 		.range([0.5, 5]),
 		"r": d3.scale.linear()
-		.domain([0, 200])
+		.domain([0, data_extent.y])
 		.range([0, 5])
 	       };
   return scales;
@@ -63,4 +63,14 @@ function draw_links(svg_elem, links, scales) {
     .classed("link", true)
     .attr({"d": lineFun})
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
+}
+
+function get_tips(nodes) {
+  tip_nodes = []
+  for(var i = 0; i < nodes.length; i++) {
+    if(nodes[i].children == null) {
+      tip_nodes.push(nodes[i])
+    }
+  }
+  return tip_nodes;
 }
