@@ -13,7 +13,7 @@ function parse_times(abund_ts) {
   return abund_ts;
 }
 
-function get_one_ts_pos(bounds, ts_extents, one_ts) {
+function get_one_ts_pos(bounds, ts_extents, one_ts, series_name) {
   scales = {"x": d3.scale.linear()
 	    .domain(ts_extents.time)
 	    .range([bounds.x_left, bounds.x_right]),
@@ -24,7 +24,9 @@ function get_one_ts_pos(bounds, ts_extents, one_ts) {
   ts_pos = [];
   for (var i = 0; i < one_ts.length; i++) {
     ts_pos.push({"x": scales.x(one_ts[i].time),
-		 "y": scales.y(one_ts[i].value)});
+		 "y": scales.y(one_ts[i].value),
+		 "series_name": series_name,
+		 "node_name": series_name + one_ts[i].time});
   }
   return ts_pos;
 }
@@ -35,13 +37,13 @@ function draw_ts(svg_elem, ts_pos) {
       .y(function(d) { return d.y; });
 
   svg_elem.selectAll(".tsPath")
-    .data(ts_pos, function(d) { return Math.random() + ""; }).enter()
+    .data(ts_pos, function(d) { return d.series_name; }).enter()
     .append("path")
     .classed("tsPath", true)
     .attr({"d": line_fun});
 
   svg_elem.selectAll(".tsNode")
-    .data(ts_pos[0], function(d) { return Math.random() + "";}).enter()
+    .data(ts_pos[0], function(d) { return d.node_name;}).enter()
     .append("circle")
     .classed("tsNode", true)
     .attr({"cx": function(d) { return d.x; },
@@ -82,7 +84,7 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   ts_extents = get_ts_extent(abund_ts)
   for (var i = 0; i < tips.length; i++) {
     cur_ts = abund_ts[tips[i].name];
-    ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts);
+    ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
     draw_ts(svg_elem, [ts_pos]);
   }
 }
