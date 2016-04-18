@@ -49,15 +49,15 @@ function draw_ts(svg_elem, ts_pos) {
 function get_ts_bounds(tips, scales, left_bound, right_bound) {
   start_diff = [];
   for (var i = 1; i < tips.length; i++) {
-    start_diff.push(scales.y(tips[i].x) - scales.y(tips[i - 1].x));
+    start_diff.push(scales.x(tips[i].x) - scales.x(tips[i - 1].x));
   }
   min_diff = d3.min(start_diff);
   
   ts_bounds = [];
   for (var i = 0; i < tips.length; i++) {
     ts_bounds.push({"x_left": left_bound, "x_right": right_bound,
-		    "y_top": scales.y(tips[i].x),
-		    "y_bottom": scales.y(tips[i].x) - min_diff})
+		    "y_top": scales.x(tips[i].x),
+		    "y_bottom": scales.x(tips[i].x) - min_diff})
   }
   return (ts_bounds);
 }

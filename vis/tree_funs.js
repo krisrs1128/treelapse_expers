@@ -8,10 +8,10 @@ function get_node_cluster(tree, width, height) {
 }
 
 function get_scales(data_extent, vis_extent, paddings) {
-  var scales = {"x": d3.scale.linear()
+  var scales = {"y": d3.scale.linear() // height along the phylo (y) is width on the screen (x)
 		.domain([0, data_extent.x])
 		.range([paddings.x_left, vis_extent.width - paddings.x_right]),
-		"y": d3.scale.linear()
+		"x": d3.scale.linear() // width on the phylo
 		.domain([0, data_extent.y])
 		.range([paddings.y_top, vis_extent.height - paddings.y_bottom]),
 		"edge": d3.scale.linear()
@@ -29,8 +29,8 @@ function draw_nodes(svg_elem, node_data, scales) {
     .data(node_data).enter()
     .append("circle")
     .classed("node", true)
-    .attr({"cx": function(d) { return scales.x(d.y); },
-	   "cy": function(d) { return scales.y(d.x); },
+    .attr({"cx": function(d) { return scales.y(d.y); },
+	   "cy": function(d) { return scales.x(d.x); },
 	   "r": function(d) { return scales.r(d.abund); }});
 }
 
@@ -51,8 +51,8 @@ function insert_node_abund(nodes, abund) {
 
 function draw_links(svg_elem, links, scales) {
   var lineFun = d3.svg.line()
-      .x(function(d) { return scales.x(d.y); })
-      .y(function(d) { return scales.y(d.x); })
+      .x(function(d) { return scales.y(d.y); })
+      .y(function(d) { return scales.x(d.x); })
       .interpolate("step-before");
 
   link_array = links.map(function(x) { return [x.source, x.target]; });
