@@ -1,22 +1,24 @@
 
-function get_one_ts_pos(bounds, one_ts) {
-  parse_date = d3.time.format("%Y-%m-%d").parse;
-  for (var i = 0; i < one_ts.length; i++) {
-    // sometimes automatically knows string is a date
-    if (!(one_ts[i].time instanceof Date)) {
-      one_ts[i].time = parse_date(one_ts[i].time);
+function parse_times(abund_ts) {
+  parser = d3.time.format("%Y-%m-%d").parse;
+  for (var ts_key in abund_ts) {
+    one_ts = abund_ts[ts_key];
+    for (var i = 0; i < abund_ts[ts_key].length; i++) {
+      // sometimes automatically knows string is a date
+      if (!(abund_ts[ts_key][i].time instanceof Date)) {
+	abund_ts[ts_key][i].time = parser(abund_ts[ts_key][i].time);
+      }
     }
   }
-  
-  // to get the extent
-  ts_x = one_ts.map(function(z) { return z.time; });
-  ts_y = one_ts.map(function(z) { return z.value; });
+  return abund_ts;
+}
 
+function get_one_ts_pos(bounds, ts_extents, one_ts) {
   scales = {"x": d3.scale.linear()
-	    .domain(d3.extent(ts_x))
+	    .domain(ts_extents.time)
 	    .range([bounds.x_left, bounds.x_right]),
 	    "y": d3.scale.linear()
-	    .domain(d3.extent(ts_y))
+	    .domain(ts_extents.value)
 	    .range([bounds.y_top, bounds.y_bottom])};
 
   ts_pos = [];
@@ -62,10 +64,25 @@ function get_ts_bounds(tips, scales, left_bound, right_bound) {
   return (ts_bounds);
 }
 
+function get_ts_extent(ts_collection) {
+  all_values = [];
+  all_times = [];
+  for (var key in ts_collection) {
+    cur_values = ts_collection[key].map(function(d) { return d.value });
+    cur_times = ts_collection[key].map(function(d) { return d.time });
+    console.log(cur_times)
+    all_values = all_values.concat(cur_values)
+    all_times = all_times.concat(cur_times)
+  }
+
+  return {"time": d3.extent(all_times), "value": d3.extent(all_values)}
+}
+
 function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
+  ts_extents = get_ts_extent(abund_ts)
   for (var i = 0; i < tips.length; i++) {
     cur_ts = abund_ts[tips[i].name];
-    ts_pos = get_one_ts_pos(bounds[i], cur_ts);
+    ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts);
     draw_ts(svg_elem, [ts_pos]);
   }
 }
