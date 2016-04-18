@@ -42,10 +42,10 @@ function draw_ts(svg_elem, ts_pos) {
     .classed("tsPath", true)
     .attr({"d": line_fun});
 
-  svg_elem.selectAll(".tsNode")
-    .data(ts_pos[0], function(d) { return d.node_name;}).enter()
+  svg_elem.selectAll(".tsPoint")
+    .data(ts_pos[0], function(d) { return d.node_name; }).enter()
     .append("circle")
-    .classed("tsNode", true)
+    .classed("tsPoint", true)
     .attr({"cx": function(d) { return d.x; },
 	   "cy": function(d) { return d.y; }});
 }

@@ -25,10 +25,10 @@ function get_scales(data_extent, vis_extent, paddings) {
 }
 
 function draw_nodes(svg_elem, node_data, scales) {
-  svg_elem.selectAll("circle")
+  svg_elem.selectAll("treeNode")
     .data(node_data, function(d) { return d.name; }).enter()
     .append("circle")
-    .classed("node", true)
+    .classed("treeNode", true)
     .attr({"cx": function(d) { return scales.y(d.y); },
 	   "cy": function(d) { return scales.x(d.x); },
 	   "r": function(d) { return scales.r(d.abund); }});
@@ -58,10 +58,10 @@ function draw_links(svg_elem, links, scales) {
   link_array = links.map(function(x) { return [x.source, x.target]; });
   link_id_fun = function(d) { return d[0].name + "_" + d[1].name; };
 
-  svg_elem.selectAll("path")
+  svg_elem.selectAll(".treeEdge")
     .data(link_array, link_id_fun).enter()
     .append("path")
-    .classed("link", true)
+    .classed("treeEdge", true)
     .attr({"d": lineFun})
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 }
@@ -69,7 +69,7 @@ function draw_links(svg_elem, links, scales) {
 function get_tips(nodes) {
   tip_nodes = [];
   for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].children === null) {
+    if(nodes[i].children == null) {
       tip_nodes.push(nodes[i]);
     }
   }
