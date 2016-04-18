@@ -15,18 +15,18 @@ function get_scales(data_extent, vis_extent, paddings) {
 		.domain([0, data_extent.y])
 		.range([paddings.y_top, vis_extent.height - paddings.y_bottom]),
 		"edge": d3.scale.linear()
-		.domain([0, data_extent.y])
-		.range([0.5, 5]),
+		.domain([0, data_extent.r])
+		.range([0.5, 10]),
 		"r": d3.scale.linear()
-		.domain([0, data_extent.y])
-		.range([0, 5])
+		.domain([0, data_extent.r])
+		.range([0, 8])
 	       };
   return scales;
 }
 
 function draw_nodes(svg_elem, node_data, scales) {
   node_selection = svg_elem.selectAll(".treeNode")
-    .data(node_data, function(d) {  return d.name; })
+    .data(node_data, function(d) {  return d.name; });
 
   // remove exiting points
   node_selection.exit().remove();
@@ -42,7 +42,7 @@ function draw_nodes(svg_elem, node_data, scales) {
   // update attributes of existing nodes
   node_selection.transition()
     .duration(700)
-    .attr({"r": function(d) { return scales.r(d.abund); }})
+    .attr({"r": function(d) { return scales.r(d.abund); }});
 }
 
 function insert_link_abund(links, abund) {

@@ -1,5 +1,5 @@
 width = 200;
-height = 500;
+height = 900;
 
 abund["10032"] = parse_times(abund["10032"]);
 
@@ -10,24 +10,27 @@ svg_elem = d3.select("body")
   .attr({"width": width,
 	 "height": height});
 
-paddings = {"y_top": 10, "y_bottom": 10, "x_right": 10, "x_left": 10};
+paddings = {"y_top": 10, "y_bottom": 10, "x_right": 20, "x_left": 20};
 
 vis_extent = {"height": height, "width": 0.75 * width};
 
+cur_abund = {};
+abund_array = [];
+for (var key in abund["10032"]) {
+  cur_abund[key] = abund["10032"][key][0].value; // first timepoint
+  abund_array.push(cur_abund[key]);
+}
+
 x_values = tree_cluster.nodes.map(function(d) { return d.x; });
 y_values = tree_cluster.nodes.map(function(d) { return d.y; });
-data_extent = {"x": d3.max(y_values), "y": d3.max(x_values)};
+data_extent = {"x": d3.max(y_values), "y": d3.max(x_values),
+	       "r": d3.max(abund_array)};
 
 scales = get_scales(data_extent, vis_extent, paddings);
 
-cur_abund = {};
-for (var key in abund["10032"]) {
-  cur_abund[key] = abund["10032"][key][0].value; // first timepoint
-}
 
 link_data = insert_link_abund(tree_cluster.links, cur_abund);
 node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
-console.log(node_data)
 draw_links(svg_elem, link_data, scales);
 draw_nodes(svg_elem, node_data, scales);
 
@@ -37,7 +40,7 @@ draw_time_i = function(i) {
     cur_abund[key] = abund["10032"][key][i].value; // 4th timepoint
   }
 
-  node_data = insert_node_abund(tree_cluster.nodes, cur_abund)
+  node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
   draw_nodes(svg_elem, node_data, scales);
 }
 
