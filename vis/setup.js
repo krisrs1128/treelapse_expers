@@ -1,5 +1,5 @@
 width = 200;
-height = 300;
+height = 500;
 
 abund["10032"] = parse_times(abund["10032"]);
 
@@ -43,4 +43,4 @@ draw_time_i = function(i) {
 
 tips = get_tips(tree_cluster.nodes);
 bounds = get_ts_bounds(tips, scales, 0.75 * width, width);
-//draw_tip_ts(svg_elem, abund["10032"], tips, bounds);
+draw_tip_ts(svg_elem, abund["10032"], tips, bounds);

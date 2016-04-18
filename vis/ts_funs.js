@@ -1,16 +1,16 @@
 
-function parse_times(abund_ts) {
-  parser = d3.time.format("%Y-%m-%d").parse;
-  for (var ts_key in abund_ts) {
-    one_ts = abund_ts[ts_key];
-    for (var i = 0; i < abund_ts[ts_key].length; i++) {
+function parse_times(ts_collection) {
+  parser = d3.time.format("%m-%d-%Y").parse;
+  for (var ts_key in ts_collection) {
+    one_ts = ts_collection[ts_key];
+    for (var i = 0; i < ts_collection[ts_key].length; i++) {
       // sometimes automatically knows string is a date
-      if (!(abund_ts[ts_key][i].time instanceof Date)) {
-	abund_ts[ts_key][i].time = parser(abund_ts[ts_key][i].time);
+      if (!(ts_collection[ts_key][i].time instanceof Date)) {
+	ts_collection[ts_key][i].time = parser(ts_collection[ts_key][i].time);
       }
     }
   }
-  return abund_ts;
+  return ts_collection;
 }
 
 function get_one_ts_pos(bounds, ts_extents, one_ts, series_name) {
