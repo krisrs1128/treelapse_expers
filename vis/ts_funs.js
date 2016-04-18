@@ -47,7 +47,7 @@ function draw_ts(svg_elem, ts_pos) {
     .append("circle")
     .classed("tsNode", true)
     .attr({"cx": function(d) { return d.x; },
-	   "cy": function(d) { return d.y; }})
+	   "cy": function(d) { return d.y; }});
 }
 
 function get_ts_bounds(tips, scales, left_bound, right_bound) {
@@ -61,7 +61,7 @@ function get_ts_bounds(tips, scales, left_bound, right_bound) {
   for (var i = 0; i < tips.length; i++) {
     ts_bounds.push({"x_left": left_bound, "x_right": right_bound,
 		    "y_top": scales.x(tips[i].x),
-		    "y_bottom": scales.x(tips[i].x) - min_diff})
+		    "y_bottom": scales.x(tips[i].x) - min_diff});
   }
   return (ts_bounds);
 }
@@ -70,18 +70,17 @@ function get_ts_extent(ts_collection) {
   all_values = [];
   all_times = [];
   for (var key in ts_collection) {
-    cur_values = ts_collection[key].map(function(d) { return d.value });
-    cur_times = ts_collection[key].map(function(d) { return d.time });
-    console.log(cur_times)
-    all_values = all_values.concat(cur_values)
-    all_times = all_times.concat(cur_times)
+    cur_values = ts_collection[key].map(function(d) { return d.value; });
+    cur_times = ts_collection[key].map(function(d) { return d.time; });
+    all_values = all_values.concat(cur_values);
+    all_times = all_times.concat(cur_times);
   }
 
-  return {"time": d3.extent(all_times), "value": d3.extent(all_values)}
+  return {"time": d3.extent(all_times), "value": d3.extent(all_values)};
 }
 
 function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
-  ts_extents = get_ts_extent(abund_ts)
+  ts_extents = get_ts_extent(abund_ts);
   for (var i = 0; i < tips.length; i++) {
     cur_ts = abund_ts[tips[i].name];
     ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);

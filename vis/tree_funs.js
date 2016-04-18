@@ -66,10 +66,10 @@ function draw_links(svg_elem, links, scales) {
 }
 
 function get_tips(nodes) {
-  tip_nodes = []
+  tip_nodes = [];
   for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].children == null) {
-      tip_nodes.push(nodes[i])
+    if(nodes[i].children === null) {
+      tip_nodes.push(nodes[i]);
     }
   }
   return tip_nodes;
