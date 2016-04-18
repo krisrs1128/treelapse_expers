@@ -36,7 +36,7 @@ tmp <- tempfile()
 download.file(pregnancy_path, tmp)
 load(tmp)
 
-PS <- PS %>% subset_taxa(Genus == "Ruminococcus")
+PS <- PS %>% subset_taxa(Genus == "F:Lachnospiraceae")
 
 ## --- sample data ----
 Z <- sample_data(PS)[, c("DateColl", "SubjectID")] %>%
