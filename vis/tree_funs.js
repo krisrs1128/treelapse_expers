@@ -25,13 +25,24 @@ function get_scales(data_extent, vis_extent, paddings) {
 }
 
 function draw_nodes(svg_elem, node_data, scales) {
-  svg_elem.selectAll("treeNode")
-    .data(node_data, function(d) { return d.name; }).enter()
+  node_selection = svg_elem.selectAll(".treeNode")
+    .data(node_data, function(d) {  return d.name; })
+
+  // remove exiting points
+  node_selection.exit().remove();
+
+  // draw new nodes for first time
+  node_selection.enter()
     .append("circle")
     .classed("treeNode", true)
     .attr({"cx": function(d) { return scales.y(d.y); },
 	   "cy": function(d) { return scales.x(d.x); },
 	   "r": function(d) { return scales.r(d.abund); }});
+
+  // update attributes of existing nodes
+  node_selection.transition()
+    .duration(700)
+    .attr({"r": function(d) { return scales.r(d.abund); }})
 }
 
 function insert_link_abund(links, abund) {
