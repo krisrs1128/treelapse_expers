@@ -37,7 +37,7 @@ function draw_ts(svg_elem, ts_pos) {
       .y(function(d) { return d.y; });
 
   svg_elem.selectAll(".tsPath")
-    .data(ts_pos, function(d) { return d.series_name; }).enter()
+    .data(ts_pos, function(d) { return d[0].series_name; }).enter()
     .append("path")
     .classed("tsPath", true)
     .attr({"d": line_fun});
