@@ -26,7 +26,7 @@ function get_scales(data_extent, vis_extent, paddings) {
 
 function draw_nodes(svg_elem, node_data, scales) {
   svg_elem.selectAll("circle")
-    .data(node_data).enter()
+    .data(node_data, function(d) { return d.name; }).enter()
     .append("circle")
     .classed("node", true)
     .attr({"cx": function(d) { return scales.y(d.y); },
@@ -56,9 +56,10 @@ function draw_links(svg_elem, links, scales) {
       .interpolate("step-before");
 
   link_array = links.map(function(x) { return [x.source, x.target]; });
+  link_id_fun = function(d) { return d[0].name + "_" + d[1].name; };
 
   svg_elem.selectAll("path")
-    .data(link_array).enter()
+    .data(link_array, link_id_fun).enter()
     .append("path")
     .classed("link", true)
     .attr({"d": lineFun})
