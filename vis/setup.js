@@ -1,5 +1,5 @@
-width = 500;
-height = 250;
+width = 200;
+height = 300;
 
 tree_cluster = get_node_cluster(tree, width, height);
 
@@ -8,8 +8,15 @@ svg_elem = d3.select("body")
   .attr({"width": width,
 	 "height": height});
 
-paddings = {"y_top": 25, "y_bottom": 25, "x_right": 25, "x_left": 25};
-scales = get_scales(height, width, paddings);
+paddings = {"y_top": 10, "y_bottom": 10, "x_right": 10, "x_left": 10};
+
+vis_extent = {"height": height, "width": .75 * width}
+
+x_values = tree_cluster.nodes.map(function(d) { return d.x });
+y_values = tree_cluster.nodes.map(function(d) { return d.y });
+data_extent = {"x": d3.max(y_values), "y": d3.max(x_values)}
+
+scales = get_scales(data_extent, vis_extent, paddings);
 
 times = Object.keys(abund);
 cur_abund = abund[times[0]];
@@ -22,8 +29,6 @@ node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
 draw_links(svg_elem, link_data, scales);
 draw_nodes(svg_elem, tree_cluster.nodes, scales);
 
-//one_ts = abund_ts["10032"]["16054"]
-//bounds = {"x_left": 10, "x_right": 50,
-//	  "y_top": 50, "y_bottom": 10}
-//ts_pos = get_one_ts_pos(bounds, one_ts)
-//draw_ts(svg_elem, [ts_pos])
+tips = get_tips(tree_cluster.nodes);
+bounds = get_ts_bounds(tips, scales, .75 * width, width);
+draw_tip_ts(svg_elem, abund_ts["10032"], tips, bounds);
