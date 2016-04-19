@@ -81,7 +81,7 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   }
 }
 
-function draw_ts_brush(svg_elem, time_extent, height, bounds, scales) {
+function draw_ts_brush(svg_elem, height, bounds, scales) {
   var brush;
   function brushed() {
     var extent_start = brush.extent();

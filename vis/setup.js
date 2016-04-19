@@ -1,4 +1,4 @@
-width = 200;
+width = 300;
 height = 10000;
 
 // only worry about one person right now
@@ -34,4 +34,4 @@ bounds = get_ts_bounds(tips, scales, 0.75 * width, width);
 draw_tip_ts(svg_elem, abund, tips, bounds);
 ts_extents = get_ts_extent(abund);
 draw_ts_brush(svg_elem, ts_extents, height, bounds[0], scales);
-draw_phylo(svg_elem, abund, ts_extents, tree_cluster, scales);
+draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
