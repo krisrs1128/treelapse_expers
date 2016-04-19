@@ -1,3 +1,5 @@
+@import url("http://fonts.googleapis.com/css?family=Lato:100,400");
+
 .treeEdge {
     fill: none;
     stroke: #ccc;
@@ -12,6 +14,13 @@
     fill: none;
     stroke: #72475F;
     stroke-width: .5px;
+}
+
+.tsLabel {
+    font-size: 7px;
+    font-weight: 100;
+    font-family: 'Lato';
+    opacity: 1;
 }
 
 .brush .extent {

@@ -81,7 +81,7 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   }
 }
 
-function draw_ts_brush(svg_elem, height, bounds, scales) {
+function draw_ts_brush(svg_elem, time_extent, height, bounds, scales) {
   var brush;
   function brushed() {
     var extent_start = brush.extent();
@@ -98,12 +98,12 @@ function draw_ts_brush(svg_elem, height, bounds, scales) {
   }
 
   var x_scale = d3.time.scale()
-      .domain(ts_extents.time)
+      .domain(time_extent)
       .range([bounds.x_left, bounds.x_right]);
 
   brush = d3.svg.brush()
     .x(x_scale)
-    .extent([ts_extents.time[0], ts_extents.time[1]])
+    .extent(time_extent)
     .on("brush", brushed);
 
   var brush_elem = svg_elem.append("g")
@@ -111,4 +111,14 @@ function draw_ts_brush(svg_elem, height, bounds, scales) {
       .call(brush)
       .selectAll("rect")
       .attr({"height": height});
+}
+
+function draw_tip_label(svg_elem, tips, bounds) {
+  svg_elem.selectAll(".tsLabel")
+    .data(tips).enter()
+    .append("text")
+    .classed("tsLabel", true)
+    .attr({"y": function(d, i) { return bounds[i].y_top; },
+	   "x": function(d, i) { return bounds[i].x_right + 3; }})
+    .text(function(d) { return d.name; });
 }
