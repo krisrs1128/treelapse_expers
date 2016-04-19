@@ -96,22 +96,25 @@ function get_tips(nodes) {
   return tip_nodes;
 }
 
-function sum_over_times(abund, time_extent) {
+function mean_over_times(abund, time_extent) {
   cur_abund = {};
   for (var key in abund) {
     cur_abund[key] = 0;
+    denom = 0;
     for (var i = 0; i < abund[key].length; i++) {
       if (abund[key][i].time >= time_extent[0] &
 	  abund[key][i].time <= time_extent[1]) {
 	cur_abund[key] += abund[key][i].value;
+	denom += 1.0;
       }
     }
+    cur_abund[key] = cur_abund[key] / denom;
   }
   return cur_abund;
 }
 
 function draw_phylo(svg_elem, abund, time_extent, tree_cluster, scales) {
-  cur_abund = sum_over_times(abund, time_extent);
+  cur_abund = mean_over_times(abund, time_extent);
   node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
   link_data = insert_link_abund(tree_cluster.links, cur_abund);
   draw_links(svg_elem, link_data, scales);

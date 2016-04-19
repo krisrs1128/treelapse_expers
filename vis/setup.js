@@ -1,5 +1,5 @@
 width = 200;
-height = 400;
+height = 10000;
 
 // only worry about one person right now
 abund = parse_times(abund["10032"]);
@@ -25,7 +25,7 @@ for (var key in abund) {
 
 x_values = tree_cluster.nodes.map(function(d) { return d.x; });
 y_values = tree_cluster.nodes.map(function(d) { return d.y; });
-data_extent = {"x": d3.max(y_values), "y": d3.max(x_values), "r": 5271};
+data_extent = {"x": d3.max(y_values), "y": d3.max(x_values), "r": 30};
 scales = get_scales(data_extent, vis_extent, paddings);
 
 // draw the ts
@@ -33,5 +33,5 @@ tips = get_tips(tree_cluster.nodes);
 bounds = get_ts_bounds(tips, scales, 0.75 * width, width);
 draw_tip_ts(svg_elem, abund, tips, bounds);
 ts_extents = get_ts_extent(abund);
-draw_ts_brush(svg_elem, ts_extents, bounds[0], scales);
-draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
+draw_ts_brush(svg_elem, ts_extents, height, bounds[0], scales);
+draw_phylo(svg_elem, abund, ts_extents, tree_cluster, scales);

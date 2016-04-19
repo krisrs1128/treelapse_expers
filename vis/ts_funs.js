@@ -81,7 +81,7 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   }
 }
 
-function draw_ts_brush(svg_elem, ts_extents, bounds, scales) {
+function draw_ts_brush(svg_elem, time_extent, height, bounds, scales) {
   var brush;
   function brushed() {
     var extent_start = brush.extent();
@@ -110,5 +110,5 @@ function draw_ts_brush(svg_elem, ts_extents, bounds, scales) {
       .classed("brush", true)
       .call(brush)
       .selectAll("rect")
-      .attr({"height": ts_extents.value[1] - ts_extents.value[0]});
+      .attr({"height": height});
 }
