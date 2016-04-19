@@ -75,7 +75,8 @@ for (i in seq_along(unique_subjects)) {
     cur_X <- colSums(X[cur_ix, ])
     counts <- tree_counts(phy_tree(PS), unlist(cur_X))
     counts <- setNames(counts$count, counts$label)
-    abund[[i]][ , j] <- log(1 + counts[match(rownames(abund[[i]]), names(counts))])
+    abund[[i]][ , j] <- log(1 + counts[match(rownames(abund[[i]]), names(counts))]) %>%
+      round(digits = 2)
   }
 }
 
