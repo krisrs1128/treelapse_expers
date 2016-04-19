@@ -36,16 +36,17 @@ tmp <- tempfile()
 download.file(pregnancy_path, tmp)
 load(tmp)
 
-PS <- PS %>% subset_taxa(Genus == "F:Lachnospiraceae")
+#PS <- PS %>% subset_taxa(Class == "C:Clostridia")
 
 ## --- sample data ----
 Z <- sample_data(PS)[, c("DateColl", "SubjectID")] %>%
   data.frame(check.names = F)
 colnames(Z) <- c("date", "subject")
-Z <- Z[Z$subject %in% c("10043", "10040", "10032"), ]
+#Z <- Z[Z$subject %in% c("10043", "10040", "10032"), ]
+Z <- Z[Z$subject %in% c("10032"), ]
 
 Z$date <- strptime(Z$date, "%m/%d/%y %H:%M")
-Z$date <- paste(month(Z$date), "01", year(Z$date), sep = "-")
+Z$date <- paste(month(Z$date), mday(Z$date), year(Z$date), sep = "-")
 Z$date <- as.factor(Z$date)
 X <- otu_table(PS) %>%
   data.frame(check.names = F)
@@ -74,7 +75,7 @@ for (i in seq_along(unique_subjects)) {
     cur_X <- colSums(X[cur_ix, ])
     counts <- tree_counts(phy_tree(PS), unlist(cur_X))
     counts <- setNames(counts$count, counts$label)
-    abund[[i]][ , j] <- counts[match(rownames(abund[[i]]), names(counts))]
+    abund[[i]][ , j] <- log(1 + counts[match(rownames(abund[[i]]), names(counts))])
   }
 }
 
