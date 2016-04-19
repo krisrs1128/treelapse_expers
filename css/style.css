@@ -6,10 +6,12 @@
 
 .tsPath {
     fill: none;
-    stroke: #ccc;
-    stroke-width: .75px;
+    stroke: #C4C3D0;
+    stroke-width: 1px;
 }
 
-.tsPoint {
-    r: .9px;
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .05;
+  shape-rendering: crispEdges;
 }

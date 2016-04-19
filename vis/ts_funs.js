@@ -41,13 +41,6 @@ function draw_ts(svg_elem, ts_pos) {
     .append("path")
     .classed("tsPath", true)
     .attr({"d": line_fun});
-
-  svg_elem.selectAll(".tsPoint")
-    .data(ts_pos[0], function(d) { return d.node_name; }).enter()
-    .append("circle")
-    .classed("tsPoint", true)
-    .attr({"cx": function(d) { return d.x; },
-	   "cy": function(d) { return d.y; }});
 }
 
 function get_ts_bounds(tips, scales, left_bound, right_bound) {
@@ -86,4 +79,36 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
     ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
     draw_ts(svg_elem, [ts_pos]);
   }
+}
+
+
+function draw_ts_brush(svg_elem, ts_extents, bounds) {
+
+  var brush;
+  function brushed() {
+    var extent_start = brush.extent();
+    var extent_end = extent_start;
+    if (d3.event.mode === "move") {
+      var d_start = d3.time.day.round(extent_start[0]);
+      var d_end = d3.time.day.round(extent_start[1]);
+      extent_end = [d_start, d_end];
+    }
+    d3.select(this).call(brush.extent(extent_end));
+  }
+
+
+  var x_scale = d3.time.scale()
+      .domain(ts_extents.time)
+      .range([bounds.x_left, bounds.x_right]);
+
+  brush = d3.svg.brush()
+    .x(x_scale)
+    .extent([ts_extents.time[0], ts_extents.time[1]])
+    .on("brush", brushed);
+
+  var brush_elem = svg_elem.append("g")
+      .classed("brush", true)
+      .call(brush)
+      .selectAll("rect")
+      .attr({"height": ts_extents.value[1] - ts_extents.value[0]});
 }
