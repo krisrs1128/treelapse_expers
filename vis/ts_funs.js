@@ -14,17 +14,17 @@ function parse_times(ts_collection) {
 }
 
 function get_one_ts_pos(bounds, ts_extents, one_ts, series_name) {
-  scales = {"x": d3.scale.linear()
-	    .domain(ts_extents.time)
-	    .range([bounds.x_left, bounds.x_right]),
-	    "y": d3.scale.linear()
-	    .domain(ts_extents.value)
-	    .range([bounds.y_top, bounds.y_bottom])};
+  ts_scale = {"x": d3.scale.linear()
+	      .domain(ts_extents.time)
+	      .range([bounds.x_left, bounds.x_right]),
+	      "y": d3.scale.linear()
+	      .domain(ts_extents.value)
+	      .range([bounds.y_top, bounds.y_bottom])};
 
   ts_pos = [];
   for (var i = 0; i < one_ts.length; i++) {
-    ts_pos.push({"x": scales.x(one_ts[i].time),
-		 "y": scales.y(one_ts[i].value),
+    ts_pos.push({"x": ts_scale.x(one_ts[i].time),
+		 "y": ts_scale.y(one_ts[i].value),
 		 "series_name": series_name,
 		 "node_name": series_name + one_ts[i].time});
   }
@@ -43,18 +43,18 @@ function draw_ts(svg_elem, ts_pos) {
     .attr({"d": line_fun});
 }
 
-function get_ts_bounds(tips, scales, left_bound, right_bound) {
+function get_ts_bounds(tips, ts_scale, left_bound, right_bound) {
   start_diff = [];
   for (var i = 1; i < tips.length; i++) {
-    start_diff.push(scales.x(tips[i].x) - scales.x(tips[i - 1].x));
+    start_diff.push(ts_scale.x(tips[i].x) - ts_scale.x(tips[i - 1].x));
   }
   min_diff = d3.min(start_diff);
   
   ts_bounds = [];
   for (var i = 0; i < tips.length; i++) {
     ts_bounds.push({"x_left": left_bound, "x_right": right_bound,
-		    "y_top": scales.x(tips[i].x),
-		    "y_bottom": scales.x(tips[i].x) - min_diff});
+		    "y_top": ts_scale.x(tips[i].x),
+		    "y_bottom": ts_scale.x(tips[i].x) - min_diff});
   }
   return (ts_bounds);
 }
@@ -81,9 +81,7 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   }
 }
 
-
-function draw_ts_brush(svg_elem, ts_extents, bounds) {
-
+function draw_ts_brush(svg_elem, ts_extents, bounds, scales) {
   var brush;
   function brushed() {
     var extent_start = brush.extent();
@@ -94,8 +92,10 @@ function draw_ts_brush(svg_elem, ts_extents, bounds) {
       extent_end = [d_start, d_end];
     }
     d3.select(this).call(brush.extent(extent_end));
-  }
 
+    // these are globals...
+    draw_phylo(svg_elem, abund, extent_end, tree_cluster, scales);
+  }
 
   var x_scale = d3.time.scale()
       .domain(ts_extents.time)

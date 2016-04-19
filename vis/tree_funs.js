@@ -16,10 +16,10 @@ function get_scales(data_extent, vis_extent, paddings) {
 		.range([paddings.y_top, vis_extent.height - paddings.y_bottom]),
 		"edge": d3.scale.linear()
 		.domain([0, data_extent.r])
-		.range([0.5, 10]),
+		.range([0.5, 12]),
 		"r": d3.scale.linear()
 		.domain([0, data_extent.r])
-		.range([0, 8])
+		.range([0, 15])
 	       };
   return scales;
 }
@@ -61,19 +61,28 @@ function insert_node_abund(nodes, abund) {
 }
 
 function draw_links(svg_elem, links, scales) {
-  var lineFun = d3.svg.line()
+  link_array = links.map(function(x) { return [x.source, x.target]; });
+  link_id_fun = function(d) { return d[0].name + "_" + d[1].name; };
+
+  link_selection = svg_elem.selectAll(".treeEdge")
+    .data(link_array, link_id_fun);
+
+  // remove exiting points
+  link_selection.exit().remove();
+
+  var line_fun = d3.svg.line()
       .x(function(d) { return scales.y(d.y); })
       .y(function(d) { return scales.x(d.x); })
       .interpolate("step-before");
 
-  link_array = links.map(function(x) { return [x.source, x.target]; });
-  link_id_fun = function(d) { return d[0].name + "_" + d[1].name; };
-
-  svg_elem.selectAll(".treeEdge")
-    .data(link_array, link_id_fun).enter()
+  link_selection.enter()
     .append("path")
     .classed("treeEdge", true)
-    .attr({"d": lineFun})
+    .attr({"d": line_fun})
+    .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
+
+  link_selection.transition()
+    .duration(700)
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 }
 
@@ -85,4 +94,26 @@ function get_tips(nodes) {
     }
   }
   return tip_nodes;
+}
+
+function sum_over_times(abund, time_extent) {
+  cur_abund = {};
+  for (var key in abund) {
+    cur_abund[key] = 0;
+    for (var i = 0; i < abund[key].length; i++) {
+      if (abund[key][i].time >= time_extent[0] &
+	  abund[key][i].time <= time_extent[1]) {
+	cur_abund[key] += abund[key][i].value;
+      }
+    }
+  }
+  return cur_abund;
+}
+
+function draw_phylo(svg_elem, abund, time_extent, tree_cluster, scales) {
+  cur_abund = sum_over_times(abund, time_extent);
+  node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
+  link_data = insert_link_abund(tree_cluster.links, cur_abund);
+  draw_links(svg_elem, link_data, scales);
+  draw_nodes(svg_elem, node_data, scales);
 }
