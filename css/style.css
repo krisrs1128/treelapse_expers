@@ -4,10 +4,14 @@
     stroke-width: 1.5px;
 }
 
+.treeNode {
+    fill: #757BA0;
+}
+
 .tsPath {
     fill: none;
-    stroke: #C4C3D0;
-    stroke-width: 1px;
+    stroke: #72475F;
+    stroke-width: .5px;
 }
 
 .brush .extent {
