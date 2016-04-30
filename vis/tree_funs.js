@@ -24,8 +24,9 @@ function get_scales(data_extent, vis_extent, paddings) {
   return scales;
 }
 
-function draw_nodes(svg_elem, node_data, scales) {
-  node_selection = svg_elem.selectAll(".treeNode")
+function draw_nodes(node_data, scales) {
+  node_selection = d3.select("#nodes")
+    .selectAll(".treeNode")
     .data(node_data, function(d) {  return d.name; });
 
   // remove exiting points
@@ -37,12 +38,17 @@ function draw_nodes(svg_elem, node_data, scales) {
     .classed("treeNode", true)
     .attr({"cx": function(d) { return scales.y(d.depth); },
 	   "cy": function(d) { return scales.x(d.x); },
-	   "r": function(d) { return scales.r(d.abund); }});
+	   "r": 0})
+    .transition()
+    .duration(700)
+    .attr({"r": function(d) { return scales.r(d.abund); }})
 
   // update attributes of existing nodes
   node_selection.transition()
     .duration(700)
-    .attr({"r": function(d) { return scales.r(d.abund); }});
+    .attr({"cx": function(d) { return scales.y(d.depth); },
+	   "cy": function(d) { return scales.x(d.x); },
+	   "r": function(d) { return scales.r(d.abund); }});
 }
 
 function insert_link_abund(links, abund) {
@@ -60,11 +66,12 @@ function insert_node_abund(nodes, abund) {
   return nodes;
 }
 
-function draw_links(svg_elem, links, scales) {
+function draw_links(links, scales) {
   link_array = links.map(function(x) { return [x.source, x.target]; });
   link_id_fun = function(d) { return d[0].name + "_" + d[1].name; };
 
-  link_selection = svg_elem.selectAll(".treeEdge")
+  link_selection = d3.select("#links")
+    .selectAll(".treeEdge")
     .data(link_array, link_id_fun);
 
   // remove exiting points
@@ -79,10 +86,14 @@ function draw_links(svg_elem, links, scales) {
     .append("path")
     .classed("treeEdge", true)
     .attr({"d": line_fun})
+    .style({"stroke-width": 0})
+    .transition()
+    .duration(700)
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 
   link_selection.transition()
     .duration(700)
+    .attr({"d": line_fun})
     .style({"stroke-width": function(d) { return scales.edge(d[1].abund); }});
 }
 
@@ -94,6 +105,15 @@ function get_tips(nodes) {
     }
   }
   return tip_nodes;
+}
+
+function update_depth() {
+  var filter_depth = document.getElementById("depthSlider").value;
+  var cur_nodes = init_cluster.nodes
+      .filter(function(d) { return d.depth < filter_depth;})
+      .map(function(d) { return d.name; });
+  var cur_tree = filter_tree(tree, cur_nodes, {});
+  update_phylo(cur_tree, abund, width, height);
 }
 
 function mean_over_times(abund, time_extent) {
@@ -113,10 +133,54 @@ function mean_over_times(abund, time_extent) {
   return cur_abund;
 }
 
-function draw_phylo(svg_elem, abund, time_extent, tree_cluster, scales) {
+function draw_phylo(abund, time_extent, tree_cluster, scales) {
   cur_abund = mean_over_times(abund, time_extent);
   node_data = insert_node_abund(tree_cluster.nodes, cur_abund);
   link_data = insert_link_abund(tree_cluster.links, cur_abund);
-  draw_links(svg_elem, link_data, scales);
-  draw_nodes(svg_elem, node_data, scales);
+  draw_links(link_data, scales);
+  draw_nodes(node_data, scales);
+}
+
+function update_phylo(tree, abund, width, height) {
+  var cur_cluster = get_node_cluster(tree, width, height);
+  var x_values = cur_cluster.nodes.map(function(d) { return d.x; });
+  var y_values = cur_cluster.nodes.map(function(d) { return d.depth; });
+  var data_extent = {"x": d3.max(y_values), "y": d3.max(x_values), "r": 30};
+  var scales = get_scales(data_extent, vis_extent, paddings);
+
+  // draw the phylo
+  var ts_extents = get_ts_extent(abund);
+  draw_phylo(abund, ts_extents.time, cur_cluster, scales);
+  
+  // draw the ts
+  var tips = get_tips(cur_cluster.nodes);
+  var bounds = get_ts_bounds(tips, scales, .1 * width);
+  draw_tip_ts(svg_elem, abund, tips, bounds);
+}
+
+function filter_tree(tree, nodes, copy) {
+  // case current subtree is not include in nodes list
+  if (nodes.indexOf(tree.name) == -1) {
+    return;
+  }
+
+  copy.name = tree.name;
+  copy.length = tree.length;
+  copy.depth = tree.depth;
+
+  // case we're at a tip
+  var cur_children = tree.children;
+  if (cur_children == null) {
+    return copy;
+  }
+
+  // proceed down the tree
+  copy.children = []
+  for (var i = 0; i < cur_children.length; i++) {
+    var subtree = filter_tree(cur_children[i], nodes, {});
+    if (subtree != undefined) {
+      copy.children.push(subtree);
+    }
+  }
+  return copy;
 }

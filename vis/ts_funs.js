@@ -36,8 +36,10 @@ function draw_ts(svg_elem, ts_pos) {
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; });
 
-  svg_elem.selectAll(".tsPath")
-    .data(ts_pos, function(d) { return d[0].series_name; }).enter()
+  var ts_selection = svg_elem.selectAll(".tsPath")
+    .data(ts_pos, function(d) { return d[0].series_name; })
+
+  ts_selection.enter()
     .append("path")
     .classed("tsPath", true)
     .attr({"d": line_fun});
@@ -75,6 +77,7 @@ function get_ts_extent(ts_collection) {
 
 function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   ts_extents = get_ts_extent(abund_ts);
+  d3.selectAll(".tsPath").remove()
   for (var i = 0; i < tips.length; i++) {
     cur_ts = abund_ts[tips[i].name];
     ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
@@ -102,7 +105,8 @@ function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
     }
 
     // these are globals...
-    draw_phylo(svg_elem, abund, extent_end, tree_cluster, scales);
+    ts_extents.time = extent_end
+    draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
   }
 
   for (var i = 0; i < bounds.length; i++) {
