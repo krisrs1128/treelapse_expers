@@ -43,7 +43,7 @@ function draw_ts(svg_elem, ts_pos) {
     .attr({"d": line_fun});
 }
 
-function get_ts_bounds(tips, ts_scale, left_bound, right_bound) {
+function get_ts_bounds(tips, ts_scale, width, padding = 10) {
   start_diff = [];
   for (var i = 1; i < tips.length; i++) {
     start_diff.push(ts_scale.x(tips[i].x) - ts_scale.x(tips[i - 1].x));
@@ -52,7 +52,8 @@ function get_ts_bounds(tips, ts_scale, left_bound, right_bound) {
   
   ts_bounds = [];
   for (var i = 0; i < tips.length; i++) {
-    ts_bounds.push({"x_left": left_bound, "x_right": right_bound,
+    ts_bounds.push({"x_left": ts_scale.y(tips[i].depth) + padding,
+		    "x_right": ts_scale.y(tips[i].depth) + padding + width,
 		    "y_top": ts_scale.x(tips[i].x),
 		    "y_bottom": ts_scale.x(tips[i].x) - min_diff});
   }
@@ -81,36 +82,46 @@ function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
   }
 }
 
-function draw_ts_brush(svg_elem, time_extent, height, bounds, scales) {
-  var brush;
+function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
+  var brushes = [];
   function brushed() {
-    var extent_start = brush.extent();
+    var brush_ix = d3.select(this)
+	.attr("id")
+	.replace( /^\D+/g, '');
+    var extent_start = brushes[brush_ix].extent();
     var extent_end = extent_start;
     if (d3.event.mode === "move") {
       var d_start = d3.time.day.round(extent_start[0]);
       var d_end = d3.time.day.round(extent_start[1]);
       extent_end = [d_start, d_end];
     }
-    d3.select(this).call(brush.extent(extent_end));
+
+    for (var i = 0; i < brushes.length; i++) {
+      cur_elem = d3.select("#brush-" + i)
+      cur_elem.call(brushes[i].extent(extent_end));
+    }
 
     // these are globals...
     draw_phylo(svg_elem, abund, extent_end, tree_cluster, scales);
   }
 
-  var x_scale = d3.time.scale()
-      .domain(time_extent)
-      .range([bounds.x_left, bounds.x_right]);
-
-  brush = d3.svg.brush()
-    .x(x_scale)
-    .extent(time_extent)
-    .on("brush", brushed);
-
-  var brush_elem = svg_elem.append("g")
+  for (var i = 0; i < bounds.length; i++) {
+    var x_scale = d3.time.scale()
+	.domain(ts_extents.time)
+	.range([bounds[i].x_left, bounds[i].x_right]);
+    cur_brush = d3.svg.brush()
+      .x(x_scale)
+      .extent(ts_extents.time)
+      .on("brush", brushed);
+    brushes.push(cur_brush);
+    svg_elem.append("g")
       .classed("brush", true)
-      .call(brush)
+      .attr("id", "brush-" + i)
+      .call(brushes[i])
       .selectAll("rect")
-      .attr({"height": height});
+      .attr({"height": bounds[i].y_top - bounds[i].y_bottom + 1,
+	     "y": bounds[i].y_bottom})
+  }
 }
 
 function draw_tip_label(svg_elem, tips, bounds) {

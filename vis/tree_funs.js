@@ -35,7 +35,7 @@ function draw_nodes(svg_elem, node_data, scales) {
   node_selection.enter()
     .append("circle")
     .classed("treeNode", true)
-    .attr({"cx": function(d) { return scales.y(d.y); },
+    .attr({"cx": function(d) { return scales.y(d.depth); },
 	   "cy": function(d) { return scales.x(d.x); },
 	   "r": function(d) { return scales.r(d.abund); }});
 
@@ -71,7 +71,7 @@ function draw_links(svg_elem, links, scales) {
   link_selection.exit().remove();
 
   var line_fun = d3.svg.line()
-      .x(function(d) { return scales.y(d.y); })
+      .x(function(d) { return scales.y(d.depth); })
       .y(function(d) { return scales.x(d.x); })
       .interpolate("step-before");
 

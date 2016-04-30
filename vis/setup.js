@@ -24,15 +24,15 @@ for (var key in abund) {
 }
 
 x_values = tree_cluster.nodes.map(function(d) { return d.x; });
-y_values = tree_cluster.nodes.map(function(d) { return d.y; });
+y_values = tree_cluster.nodes.map(function(d) { return d.depth; });
 data_extent = {"x": d3.max(y_values), "y": d3.max(x_values), "r": 30};
 scales = get_scales(data_extent, vis_extent, paddings);
 
 // draw the ts
 tips = get_tips(tree_cluster.nodes);
-bounds = get_ts_bounds(tips, scales, 0.75 * width, 0.9 * width);
+bounds = get_ts_bounds(tips, scales, .2 * width);
 draw_tip_ts(svg_elem, abund, tips, bounds);
 ts_extents = get_ts_extent(abund);
-draw_ts_brush(svg_elem, ts_extents.time, height, bounds[0], scales);
+draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales);
 draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
 draw_tip_label(svg_elem, tips, bounds);
