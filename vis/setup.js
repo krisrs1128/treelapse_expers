@@ -1,5 +1,5 @@
-width = 500;
-height = 500;
+width = 800;
+height = 800;
 
 // only worry about one person right now
 abund = parse_times(abund["10032"]);
@@ -31,12 +31,4 @@ for (var key in abund) {
 }
 
 init_cluster = get_node_cluster(tree, width, height);
-
-// draw the ts
-//tips = get_tips(tree_cluster.nodes);
-//bounds = get_ts_bounds(tips, scales, .1 * width);
-//draw_tip_ts(svg_elem, abund, tips, bounds);
-//ts_extents = get_ts_extent(abund);
-//draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales);
-//draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
-//draw_tip_label(svg_elem, tips, bounds);
+update_depth()

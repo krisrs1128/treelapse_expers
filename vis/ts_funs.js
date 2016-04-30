@@ -126,14 +126,19 @@ function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
       .extent(ts_extents.time)
       .on("brush", brushed);
     brushes.push(cur_brush);
-    d3.select("#tip_brushes")
+    brush_elem = d3.select("#tip_brushes")
       .append("g")
       .classed("brush", true)
       .attr("id", "brush-" + i)
       .call(brushes[i])
-      .selectAll("rect")
+
+    brush_elem.selectAll("rect")
+      .attr({"height": 0,
+	     "y": bounds[i].y_top})
+      .transition()
+      .duration(700)
       .attr({"height": bounds[i].y_top - bounds[i].y_bottom,
-	     "y": bounds[i].y_bottom})
+	     "y": bounds[i].y_bottom});
   }
 }
 

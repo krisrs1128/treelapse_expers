@@ -155,7 +155,6 @@ function update_phylo(tree, abund, width, height) {
   // draw the ts
   var tips = get_tips(cur_cluster.nodes);
   var bounds = get_ts_bounds(tips, scales, .1 * width);
-  console.log(bounds);
   draw_tip_ts(abund, tips, bounds);
   draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales);
 }
