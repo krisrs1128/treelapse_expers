@@ -24,7 +24,5 @@
 }
 
 .brush .extent {
-  stroke: #fff;
-  fill-opacity: .05;
-  shape-rendering: crispEdges;
+    fill-opacity: .03;
 }

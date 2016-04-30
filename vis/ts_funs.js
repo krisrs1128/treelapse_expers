@@ -119,7 +119,7 @@ function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
       .attr("id", "brush-" + i)
       .call(brushes[i])
       .selectAll("rect")
-      .attr({"height": bounds[i].y_top - bounds[i].y_bottom + 1,
+      .attr({"height": bounds[i].y_top - bounds[i].y_bottom,
 	     "y": bounds[i].y_bottom})
   }
 }
