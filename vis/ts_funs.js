@@ -31,20 +31,6 @@ function get_one_ts_pos(bounds, ts_extents, one_ts, series_name) {
   return ts_pos;
 }
 
-function draw_ts(svg_elem, ts_pos) {
-  var line_fun = d3.svg.line()
-      .x(function(d) { return d.x; })
-      .y(function(d) { return d.y; });
-
-  var ts_selection = svg_elem.selectAll(".tsPath")
-    .data(ts_pos, function(d) { return d[0].series_name; })
-
-  ts_selection.enter()
-    .append("path")
-    .classed("tsPath", true)
-    .attr({"d": line_fun});
-}
-
 function get_ts_bounds(tips, ts_scale, width, padding = 10) {
   start_diff = [];
   for (var i = 1; i < tips.length; i++) {
@@ -75,14 +61,35 @@ function get_ts_extent(ts_collection) {
   return {"time": d3.extent(all_times), "value": d3.extent(all_values)};
 }
 
-function draw_tip_ts(svg_elem, abund_ts, tips, bounds) {
+function draw_tip_ts(abund_ts, tips, bounds) {
+  var line_fun = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; });
+
+  var ts_array = [];
+  cur_species = []
   ts_extents = get_ts_extent(abund_ts);
-  d3.selectAll(".tsPath").remove()
   for (var i = 0; i < tips.length; i++) {
     cur_ts = abund_ts[tips[i].name];
-    ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
-    draw_ts(svg_elem, [ts_pos]);
+    cur_species.push(tips[i].name);
+    one_ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
+    ts_array.push(one_ts_pos);
   }
+
+  ts_selection = d3.select("#tip_ts")
+    .selectAll(".ts_path")
+    .data(ts_array, function(d, i) { return cur_species[i] });
+  ts_selection.exit().remove()
+
+  ts_selection.enter()
+    .append("path")
+    .classed("ts_path", true)
+    .style({"opacity": 0})
+
+  ts_selection.transition()
+    .duration(700)
+    .attr({"d": line_fun})
+    .style({"opacity": 1})
 }
 
 function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {

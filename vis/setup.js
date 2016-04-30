@@ -11,10 +11,12 @@ svg_elem.append("rect")
   .attr({"width": width,
 	 "height": height,
 	 "fill": "#F7F7F7"});
-link_elem = svg_elem.append("g")
+svg_elem.append("g")
   .attr("id", "links")
-node_elem = svg_elem.append("g")
+svg_elem.append("g")
   .attr("id", "nodes")
+svg_elem.append("g")
+  .attr("id", "tip_ts")
 
 // just to get scales 
 paddings = {"y_top": 10, "y_bottom": 10, "x_right": 10, "x_left": 20};
