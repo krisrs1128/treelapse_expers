@@ -92,7 +92,7 @@ function draw_tip_ts(abund_ts, tips, bounds) {
     .style({"opacity": 1})
 }
 
-function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
+function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
   var brushes = [];
   function brushed() {
     var brush_ix = d3.select(this)
@@ -111,11 +111,12 @@ function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
       cur_elem.call(brushes[i].extent(extent_end));
     }
 
-    // these are globals...
-    ts_extents.time = extent_end
-    draw_phylo(svg_elem, abund, ts_extents.time, tree_cluster, scales);
+    draw_phylo(abund, extent_end, cur_cluster, scales);
   }
 
+  d3.select("#tip_brushes")
+    .selectAll(".brush")
+    .remove();
   for (var i = 0; i < bounds.length; i++) {
     var x_scale = d3.time.scale()
 	.domain(ts_extents.time)
@@ -125,7 +126,8 @@ function draw_ts_brush(svg_elem, ts_extents, tips, height, bounds, scales) {
       .extent(ts_extents.time)
       .on("brush", brushed);
     brushes.push(cur_brush);
-    svg_elem.append("g")
+    d3.select("#tip_brushes")
+      .append("g")
       .classed("brush", true)
       .attr("id", "brush-" + i)
       .call(brushes[i])

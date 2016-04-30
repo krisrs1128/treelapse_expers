@@ -17,6 +17,8 @@ svg_elem.append("g")
   .attr("id", "nodes")
 svg_elem.append("g")
   .attr("id", "tip_ts")
+svg_elem.append("g")
+  .attr("id", "tip_brushes")
 
 // just to get scales 
 paddings = {"y_top": 10, "y_bottom": 10, "x_right": 10, "x_left": 20};
