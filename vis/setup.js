@@ -1,5 +1,5 @@
 width = 500;
-height = 12000;
+height = 1500;
 
 // only worry about one person right now
 abund = parse_times(abund["10032"]);
