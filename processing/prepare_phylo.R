@@ -6,6 +6,7 @@
 # List of packages for session
 .packages  <-  c("data.table",
                  "plyr",
+                 "picante",
                  "phangorn",
                  "jsonlite",
                  "phyloseq",
@@ -36,7 +37,10 @@ tmp <- tempfile()
 download.file(pregnancy_path, tmp)
 load(tmp)
 
-#PS <- PS %>% subset_taxa(Class == "C:Clostridia")
+## ---- k-over-a-filter ----
+PS = PS %>%
+  filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
+
 
 ## --- sample data ----
 Z <- sample_data(PS)[, c("DateColl", "SubjectID")] %>%
@@ -66,7 +70,7 @@ abund <- replicate(length(unique_subjects),
                           ncol = length(unique_dates),
                           dimnames = list(phy_names, unique_dates)),
                    simplify = FALSE)
-    
+
 for (i in seq_along(unique_subjects)) {
   cat(sprintf("Processing subject %s\n", unique_subjects[i]))
   for(j in seq_along(unique_dates)) {
@@ -98,10 +102,13 @@ sprintf("var abund = %s", toJSON(abund, auto_unbox = T)) %>%
 
 # create a json object representing edges
 phy_names <- c(phy_tree(PS)$tip.label, phy_tree(PS)$node.label)
-el <- data.frame(phy_tree(PS)[["edge"]], phy_tree(PS)[["edge.length"]])
+node_ages <- node.age(phy_tree(PS))$ages
+el <- data.frame(phy_tree(PS)[["edge"]],
+                 phy_tree(PS)[["edge.length"]],
+                 node.age(phy_tree(PS))$age)
 el[, 1] <- phy_names[el[, 1]]
 el[, 2] <- phy_names[el[, 2]]
-colnames(el) <- c("parent", "child", "length")
+colnames(el) <- c("parent", "child", "length", "depth")
 res <- tree_json(el, "1")
 sprintf("var tree = %s", toJSON(res, auto_unbox = T)) %>%
   cat(file = file.path("data", "tree.js"))

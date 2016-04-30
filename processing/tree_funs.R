@@ -31,7 +31,7 @@ tree_counts <- function(phy, counts) {
     descendants <- node_names[desc_ix]
     result[result$label == internal_nodes[i], "count"] <- sum(counts[descendants])
   }
-  return (result)
+  result
 }
 
 # @title Generate a nested list representing the phylo structure
@@ -48,6 +48,7 @@ tree_json <- function(el, cur_node) {
     for (i in seq_along(children)) {
       sublist[[i]] <- tree_json(el, children[i])
       sublist[[i]]$length <- el[cur_ix[i], "length"]
+      sublist[[i]]$depth <- el[cur_ix[i], "depth"]
     }
     res <- list("name" = cur_node,
                 "children" = sublist)
