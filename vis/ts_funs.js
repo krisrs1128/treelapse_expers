@@ -169,3 +169,23 @@ function draw_ts_box(abund, tips, bounds) {
   var ts_array = get_ts_pos(abund, tips, rep_bounds);
   draw_ts("#ts_box", ts_array.ts, ts_array.names);
 }
+
+function draw_box_brush(bounds) {
+  var x_scale = d3.scale.linear()
+      .domain([bounds.x_left, bounds.x_right])
+      .range([bounds.x_left, bounds.x_right]);
+  var y_scale = d3.scale.linear()
+      .domain([bounds.y_bottom, bounds.y_top])
+      .range([bounds.y_bottomf, bounds.y_top]);
+
+  var brush = d3.svg.brush()
+      .x(x_scale)
+      .y(x_scale)
+      .extent([[0, 0], [100, 100]])
+
+  var brush_elem = d3.select("#box_brushes")
+      .append("g")
+      .classed("brush", true)
+      .attr({"id": "box-brush-1"})
+      .call(brush)
+}

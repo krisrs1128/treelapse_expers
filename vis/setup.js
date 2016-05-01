@@ -22,6 +22,9 @@ svg_elem.append("g")
 svg_elem.append("g")
   .attr({"id": "ts_box",
 	 "transform": "translate(0," + .7 * height + ")"})
+d3.select("#ts_box")
+  .append("g")
+  .attr("id", "box_brushes")
 
 // just to get scales 
 paddings = {"y_top": 10, "y_bottom": 10, "x_right": 10, "x_left": 20};
@@ -38,4 +41,5 @@ update_depth()
 
 box_bounds = {"x_left": 0, "x_right": width,
 	      "y_bottom": 0, "y_top": .3 * height}
+draw_box_brush(box_bounds);
 //draw_ts_box(abund, get_tips(init_cluster.nodes), box_bounds);
