@@ -152,11 +152,16 @@ function update_phylo(tree, abund, width, height) {
   var ts_extents = get_ts_extent(abund);
   draw_phylo(abund, ts_extents.time, cur_cluster, scales);
   
-  // draw the ts
+  // draw the tip ts
   var tips = get_tips(cur_cluster.nodes);
   var bounds = get_ts_bounds(tips, scales, .1 * width);
   draw_tip_ts(abund, tips, bounds);
   draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales);
+
+  // draw the box ts
+  box_bounds = {"x_left": 0, "x_right": width, "y_bottom": 0,
+		"y_top": .3 * height};
+  draw_ts_box(abund, tips, box_bounds);
 }
 
 function filter_tree(tree, nodes, copy) {

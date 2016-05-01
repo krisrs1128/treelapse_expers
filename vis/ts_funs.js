@@ -61,11 +61,7 @@ function get_ts_extent(ts_collection) {
   return {"time": d3.extent(all_times), "value": d3.extent(all_values)};
 }
 
-function draw_tip_ts(abund_ts, tips, bounds) {
-  var line_fun = d3.svg.line()
-      .x(function(d) { return d.x; })
-      .y(function(d) { return d.y; });
-
+function get_ts_pos(abund_ts, tips, bounds) {
   var ts_array = [];
   cur_species = []
   ts_extents = get_ts_extent(abund_ts);
@@ -75,10 +71,17 @@ function draw_tip_ts(abund_ts, tips, bounds) {
     one_ts_pos = get_one_ts_pos(bounds[i], ts_extents, cur_ts, tips[i].name);
     ts_array.push(one_ts_pos);
   }
+  return {"ts": ts_array, "names": cur_species};
+}
 
-  ts_selection = d3.select("#tip_ts")
+function draw_ts(elem_id, ts_pos, ts_names) {
+  var line_fun = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; });
+  
+  ts_selection = d3.select(elem_id)
     .selectAll(".ts_path")
-    .data(ts_array, function(d, i) { return cur_species[i] });
+    .data(ts_pos, function(d, i) { return ts_names[i] });
   ts_selection.exit().remove()
 
   ts_selection.enter()
@@ -89,7 +92,12 @@ function draw_tip_ts(abund_ts, tips, bounds) {
   ts_selection.transition()
     .duration(700)
     .attr({"d": line_fun})
-    .style({"opacity": 1})
+    .style({"opacity": 1})  
+}
+
+function draw_tip_ts(abund_ts, tips, bounds) {
+  var ts_array = get_ts_pos(abund_ts, tips, bounds);
+  draw_ts("#tip_ts", ts_array.ts, ts_array.names)
 }
 
 function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
@@ -150,4 +158,14 @@ function draw_tip_label(svg_elem, tips, bounds) {
     .attr({"y": function(d, i) { return bounds[i].y_top; },
 	   "x": function(d, i) { return bounds[i].x_right + 3; }})
     .text(function(d) { return d.name; });
+}
+
+function draw_ts_box(abund, tips, bounds) {
+  var rep_bounds = []
+  for (var i = 0; i < tips.length; i++) {
+    rep_bounds.push(bounds);
+  }
+  
+  var ts_array = get_ts_pos(abund, tips, rep_bounds);
+  draw_ts("#ts_box", ts_array.ts, ts_array.names);
 }
