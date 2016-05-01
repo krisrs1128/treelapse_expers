@@ -103,12 +103,6 @@ function draw_ts(elem_id, ts_pos, ts_names, highlighted_ix) {
     .style({"opacity": 1})  
 }
 
-function draw_tip_ts(abund_ts, tips, bounds) {
-  var ts_array = get_ts_pos(abund_ts, tips, bounds);
-  var highlighted_ix = get_highlighted_ts(ts_array.ts);
-  draw_ts("#tip_ts", ts_array.ts, ts_array.names, highlighted_ix);
-}
-
 function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
   var brushes = [];
   function brushed() {
@@ -157,27 +151,6 @@ function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
       .attr({"height": bounds[i].y_top - bounds[i].y_bottom,
 	     "y": bounds[i].y_bottom});
   }
-}
-
-function draw_tip_label(svg_elem, tips, bounds) {
-  svg_elem.selectAll(".tsLabel")
-    .data(tips).enter()
-    .append("text")
-    .classed("tsLabel", true)
-    .attr({"y": function(d, i) { return bounds[i].y_top; },
-	   "x": function(d, i) { return bounds[i].x_right + 3; }})
-    .text(function(d) { return d.name; });
-}
-
-function draw_ts_box(abund, tips, bounds) {
-  var rep_bounds = []
-  for (var i = 0; i < tips.length; i++) {
-    rep_bounds.push(bounds);
-  }
-  
-  var ts_array = get_ts_pos(abund, tips, rep_bounds);
-  var highlighted_ix = get_highlighted_ts(ts_array.ts);
-  draw_ts("#ts_box", ts_array.ts, ts_array.names, highlighted_ix);
 }
 
 function check_covered_line(ts, extent) {
