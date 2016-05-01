@@ -1,5 +1,5 @@
 width = 800;
-height = 800;
+height = 1500;
 
 // only worry about one person right now
 abund = parse_times(abund["10032"]);
@@ -36,10 +36,9 @@ for (var key in abund) {
   }
 }
 
+var box_brush;
+box_bounds = {"x_left": 0, "x_right": width, "y_bottom": 0,
+	      "y_top": .3 * height};
+draw_box_brush(box_bounds)
 init_cluster = get_node_cluster(tree, width, height);
 update_depth()
-
-box_bounds = {"x_left": 0, "x_right": width,
-	      "y_bottom": 0, "y_top": .3 * height}
-draw_box_brush(box_bounds);
-//draw_ts_box(abund, get_tips(init_cluster.nodes), box_bounds);

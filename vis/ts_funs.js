@@ -74,7 +74,7 @@ function get_ts_pos(abund_ts, tips, bounds) {
   return {"ts": ts_array, "names": cur_species};
 }
 
-function draw_ts(elem_id, ts_pos, ts_names) {
+function draw_ts(elem_id, ts_pos, ts_names, highlighted_ix) {
   var line_fun = d3.svg.line()
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; });
@@ -88,16 +88,25 @@ function draw_ts(elem_id, ts_pos, ts_names) {
     .append("path")
     .classed("ts_path", true)
     .style({"opacity": 0})
-
+      
   ts_selection.transition()
     .duration(700)
-    .attr({"d": line_fun})
+    .attr({"d": line_fun,
+	   "stroke-width": function(d, i) {
+	     if (highlighted_ix.indexOf(i) == -1) {
+	       return .05;
+	     } else {
+	       return 1;
+	     }
+	   }
+	  })
     .style({"opacity": 1})  
 }
 
 function draw_tip_ts(abund_ts, tips, bounds) {
   var ts_array = get_ts_pos(abund_ts, tips, bounds);
-  draw_ts("#tip_ts", ts_array.ts, ts_array.names)
+  var highlighted_ix = get_highlighted_ts(ts_array.ts);
+  draw_ts("#tip_ts", ts_array.ts, ts_array.names, highlighted_ix);
 }
 
 function draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales) {
@@ -167,7 +176,38 @@ function draw_ts_box(abund, tips, bounds) {
   }
   
   var ts_array = get_ts_pos(abund, tips, rep_bounds);
-  draw_ts("#ts_box", ts_array.ts, ts_array.names);
+  var highlighted_ix = get_highlighted_ts(ts_array.ts);
+  draw_ts("#ts_box", ts_array.ts, ts_array.names, highlighted_ix);
+}
+
+function check_covered_line(ts, extent) {
+  for (var i = 0; i < ts.length; i++) {
+    var x_contained = (ts[i].x >= extent.x_left) && (ts[i].x <= extent.x_right);
+    var y_contained = (ts[i].y <= extent.y_bottom) &&  (ts[i].y >= extent.y_top);
+    if (x_contained && y_contained) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function get_covered_lines(ts_array, extent) {
+  covered_ix = [];
+  for (var i = 0; i < ts_array.length; i++) {
+    var covered = check_covered_line(ts_array[i], extent);
+    if (covered) {
+      covered_ix.push(i);
+    }
+  }
+  return covered_ix;
+}
+
+function get_highlighted_ts(ts_array) {
+  var brush_extent = box_brush.extent();
+  var extent = {"x_left": brush_extent[0][0], "x_right": brush_extent[1][0],
+		"y_top": brush_extent[0][1], "y_bottom": brush_extent[1][1]};
+  var covered_ix = get_covered_lines(ts_array, extent);
+  return covered_ix;
 }
 
 function draw_box_brush(bounds) {
@@ -176,16 +216,16 @@ function draw_box_brush(bounds) {
       .range([bounds.x_left, bounds.x_right]);
   var y_scale = d3.scale.linear()
       .domain([bounds.y_bottom, bounds.y_top])
-      .range([bounds.y_bottomf, bounds.y_top]);
+      .range([bounds.y_bottom, bounds.y_top]);
 
-  var brush = d3.svg.brush()
-      .x(x_scale)
-      .y(x_scale)
-      .extent([[0, 0], [100, 100]])
+  box_brush = d3.svg.brush()
+    .x(x_scale)
+    .y(x_scale)
+    .extent([[0, 0], [100, 100]]);
 
   var brush_elem = d3.select("#box_brushes")
       .append("g")
       .classed("brush", true)
       .attr({"id": "box-brush-1"})
-      .call(brush)
+      .call(box_brush)
 }

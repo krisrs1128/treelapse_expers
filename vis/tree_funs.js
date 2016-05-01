@@ -151,17 +151,31 @@ function update_phylo(tree, abund, width, height) {
   // draw the phylo
   var ts_extents = get_ts_extent(abund);
   draw_phylo(abund, ts_extents.time, cur_cluster, scales);
-  
-  // draw the tip ts
+
+  // get postions for tip and box ts
   var tips = get_tips(cur_cluster.nodes);
   var bounds = get_ts_bounds(tips, scales, .1 * width);
-  draw_tip_ts(abund, tips, bounds);
+  var box_bounds = []
+  for (var i = 0; i < tips.length; i++) {
+    box_bounds.push({"x_left": 0, "x_right": width, "y_bottom": 0,
+		     "y_top": .3 * height});
+  }
+  var ts_array = get_ts_pos(abund, tips, bounds);
+  var ts_box_array = get_ts_pos(abund, tips, box_bounds);
+
+  // draw the ts
+  var highlighted_ix = get_highlighted_ts(ts_box_array.ts);
+  draw_ts("#tip_ts", ts_array.ts, ts_array.names, highlighted_ix);
+  draw_ts("#ts_box", ts_box_array.ts, ts_box_array.names, highlighted_ix);
   draw_ts_brush(ts_extents, bounds, abund, cur_cluster, scales);
 
-  // draw the box ts
-  box_bounds = {"x_left": 0, "x_right": width, "y_bottom": 0,
-		"y_top": .3 * height};
-  draw_ts_box(abund, tips, box_bounds);
+  // reset brush function
+  box_brush.on("brush", function() {
+  var ts_box_array = get_ts_pos(abund, tips, box_bounds);
+    highlighted_ix = get_highlighted_ts(ts_box_array.ts);
+    draw_ts("#tip_ts", ts_array.ts, ts_array.names, highlighted_ix);
+    draw_ts("#ts_box", ts_box_array.ts, ts_box_array.names, highlighted_ix);
+  })
 }
 
 function filter_tree(tree, nodes, copy) {
