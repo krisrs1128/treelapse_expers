@@ -55,3 +55,38 @@ tree_json <- function(el, cur_node) {
   }
   res
 }
+
+# @title Convert a Taxonomic Table into an edgelist
+# @description This is a helper that lets us convert a taxonomic table
+# (strains on rows and taxonomic ranks on columns).
+# @importFrom magrittr %>%
+# @examples
+# library("phyloseq")
+# data(GlobalPatterns)
+# taxa <- tax_table(GlobalPatterns)@.Data
+# gp_tax <- tree_from_taxa(taxa)
+tree_from_taxa <- function(taxa) {
+  taxa <- unique(taxa)
+  mapping <- taxa %>%
+    as.character() %>%
+    unique()
+  mapping <- setNames(seq_along(mapping), mapping)
+
+  el <- vector(length = nrow(taxa) * (ncol(taxa) - 1),
+               mode = "list")
+  k <- 1
+  for (i in seq_len(nrow(taxa))) {
+    for (j in seq_len(ncol(taxa) - 1)) {
+      if (is.na(taxa[i, j])) break
+      el[[k]] <- c(mapping[taxa[i, j]], mapping[taxa[i, j + 1]])
+      k <- k + 1
+    }
+  }
+
+  el <- do.call(rbind, el) %>%
+    na.omit() %>%
+    unique()
+  el <- data.frame(el[order(el[, 1]), ])
+  colnames(el) <- c("parent", "child")
+  list(el = el, mapping = mapping)
+}
