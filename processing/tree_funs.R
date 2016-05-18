@@ -12,26 +12,41 @@
 # @return tree_counts A data frame whose rows are either internal nodes or tips,
 #     column names are groups defined in aggr_var, and ij^th element is the
 #     number of OTUs descending from the i^th node within group j in aggr_var.
-tree_counts <- function(phy, counts) {
-
-  # Convert counts to data.table and extract edgelist for tree
-  names_map <- c(phy$tip.label, phy$node.label)
-  phy_edgelist <- data.table::data.table(names_map[phy$edge[, 1]], names_map[phy$edge[, 2]])
-  data.table::setnames(phy_edgelist, c("parent", "child"))
-
-  result <- data.table(label = names_map, count = counts[names_map])
-
+# library("phyloseq")
+# data(GlobalPatterns)
+# GP <- subset_taxa(GlobalPatterns, Phylum=="Chlamydiae")
+# el <- phy_tree(GP)$edge
+# mapping <- c(phy_tree(GP)$tip.label, phy_tree(GP)$node.label)
+# mapping <- setNames(mapping, seq_along(mapping))
+# counts <- otu_table(GP)@.Data[, 1]
+# tree_counts(el, mapping, counts)
+tree_counts <- function(el, mapping, counts) {
+  result <- data.table(label = mapping, count = counts[mapping])
   internal_nodes <- result[is.na(result$count), "label", with = F] %>%
     unlist()
 
   for (i in seq_along(internal_nodes)) {
-    node_names <- c(phy$tip.label, phy$node.label)
-    cur_ix  <- which(internal_nodes[i] == node_names)
-    desc_ix <- phangorn::Descendants(phy, cur_ix, type = "tips")[[1]]
-    descendants <- node_names[desc_ix]
-    result[result$label == internal_nodes[i], "count"] <- sum(counts[descendants])
+    cur_ix  <- which(internal_nodes[i] == mapping)
+    cur_tips <- tip_descendants(el, cur_ix)
+    result[result$label == internal_nodes[i], "count"] <- sum(counts[mapping[cur_tips]])
   }
   result
+}
+
+# @title Get all the descendants that are tips
+# @examples
+# library("phyloseq")
+# data(GlobalPatterns)
+# GP <- subset_taxa(GlobalPatterns, Phylum=="Chlamydiae")
+# el <- phy_tree(GP)$edge
+# tip_descendants(el, 34)
+tip_descendants <- function(el, cur_ix) {
+  library("igraph")
+  G <- graph.edgelist(el)
+  tips <- setdiff(el[, 2], el[, 1])
+  descendants <- neighborhood(G, order = max(el), nodes = cur_ix,
+                              mode = "out")[[1]]
+  tips[tips %in% descendants] 
 }
 
 # @title Generate a nested list representing the phylo structure
@@ -70,7 +85,9 @@ tree_from_taxa <- function(taxa) {
   mapping <- taxa %>%
     as.character() %>%
     unique()
+  inv_mapping <- setNames(mapping, seq_along(mapping))
   mapping <- setNames(seq_along(mapping), mapping)
+  
 
   el <- vector(length = nrow(taxa) * (ncol(taxa) - 1),
                mode = "list")
@@ -88,5 +105,5 @@ tree_from_taxa <- function(taxa) {
     unique()
   el <- data.frame(el[order(el[, 1]), ])
   colnames(el) <- c("parent", "child")
-  list(el = el, mapping = mapping)
+  list(el = el, mapping = mapping, inv_mapping = inv_mapping)
 }
