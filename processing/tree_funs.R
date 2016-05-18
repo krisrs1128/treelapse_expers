@@ -87,7 +87,6 @@ tree_from_taxa <- function(taxa) {
     unique()
   inv_mapping <- setNames(mapping, seq_along(mapping))
   mapping <- setNames(seq_along(mapping), mapping)
-  
 
   el <- vector(length = nrow(taxa) * (ncol(taxa) - 1),
                mode = "list")
@@ -106,4 +105,53 @@ tree_from_taxa <- function(taxa) {
   el <- data.frame(el[order(el[, 1]), ])
   colnames(el) <- c("parent", "child")
   list(el = el, mapping = mapping, inv_mapping = inv_mapping)
+}
+
+# @title Apply the tree_counts() function across unique time / person
+# combinations
+#
+# @description This is just a wrapper for tree_counts, that applies it
+# across subjects and times.
+# See processing/prepare_phylo.R for an example application.
+tree_counts_multi <- function(el, mapping, counts, sample_info) {
+  unique_dates <- unique(sample_info$date)
+  unique_subjects <- unique(sample_info$subject)
+  
+  one_otu_mat <- matrix(0, nrow = length(mapping),
+                        ncol = length(unique_dates),
+                        dimnames = list(mapping, unique_dates))
+  counts_list <- replicate(length(unique_subjects), one_otu_mat,
+                           simplify = FALSE)
+  
+  for (i in seq_along(unique_subjects)) {
+    cat(sprintf("Processing subject %s\n", unique_subjects[i]))
+    for (j in seq_along(unique_dates)) {
+      cur_ix <- which(sample_info$subject %in% unique_subjects[i] &
+                        sample_info$date %in% unique_dates[j])
+      cur_counts <- tree_counts(el, mapping, unlist(colSums(counts[cur_ix, ])))
+      cur_counts <- setNames(cur_counts$count, cur_counts$label)
+
+      reorder_ix <- match(rownames(counts_list[[i]]), names(cur_counts))
+      counts_list[[i]][, j] <- log(1 + cur_counts[reorder_ix]) %>%
+        round(digits = 2)
+    }
+  }
+  unfold_counts_list(counts_list)
+}
+
+# @title Utility used to unwrap the matrix in tree_counts_multi() into a list
+#
+# @description This is similar to alply, but I couldn't get that to
+# quite work.
+unfold_counts_list <- function(counts_list) {
+  counts_list %>%
+    lapply(function(z) {
+      result <- list()
+      for (i in seq_len(nrow(z))) {
+        result[[i]] <- data.frame(time = colnames(z), value = z[i, ])
+        rownames(result[[i]]) <- NULL
+      }
+      names(result) <- rownames(z)
+      result
+    })
 }
