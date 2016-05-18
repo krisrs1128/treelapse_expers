@@ -86,7 +86,7 @@ tax_abund <- tree_counts_multi(as.matrix(tax_tree$el),
                                tax_tree$inv_mapping,
                                counts, sample_info)
 sprintf("var tax_abund = %s", toJSON(phy_abund, auto_unbox = T)) %>%
-  cat(file = file.path("data", "ax_abund.js"))
+  cat(file = file.path("data", "tax_abund.js"))
 
 ## ---- phy-json ----
 # create a json object representing edges
