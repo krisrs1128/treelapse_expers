@@ -164,9 +164,146 @@ function set_node_segments(nodes, depths) {
  * @reference http://vis.stanford.edu/papers/doitrees-revisited
  **/ 
 function segment_tree(tree_var) {
-  var tree_layout = d3.layout.tree();
+  var tree_layout = d3.layout.cluster();
   var nodes = tree_layout.nodes(tree_var);
   depths = nodes.map(function(d) { return d.depth });
   nodes = set_node_segments(nodes, depths);
+  return tree_var;
+}
+
+function get_layout_size(nodes) {
+  var nodes_pos = {"x": nodes.map(function(d) { return d.x }),
+		   "y": nodes.map(function(d) { return d.y })}
+  return [d3.max(nodes_pos.x) - d3.min(nodes_pos.x),
+	  d3.max(nodes_pos.y) - d3.min(nodes_pos.y)];
+}
+
+// filter away nodes that don't have a doi assigned to them
+function filter_doi(tree_var) {
+  if (Object.keys(tree_var).indexOf("children") != -1) {
+    for (var i = 0; i < tree_var.children.length; i++) {
+      if (Object.keys(tree_var.children[i]).indexOf("doi") != -1) {
+	tree_var.children[i] = filter_doi(tree_var.children[i]);
+      }
+    }
+  }
+  return tree_var;
+}
+
+// filter away nodes in a certain block / in a certain segment
+function filter_block(tree_var, depth, segment) {
+  if (tree_var.depth == depth && tree_var.segment == segment) {
+    return;
+  }
+
+  if (Object.keys(tree_var).indexOf("children") != -1) {
+    var filtered_children = []
+    for (var i = 0; i < tree_var.children.length; i++) {
+      var filtered = filter_block(tree_var.children[i], depth, segment);
+      if (typeof filtered != "undefined") {
+	filtered_children.push(filtered);
+      }
+    }
+    tree_var.children = filtered_children;
+  }
+  return tree_var;
+}
+
+function tree_block(tree_var, focus_node_id, min_doi = -10,
+		    display_dim = [500, 500],
+		    node_size = [4, 10]) {
+  tree_var = set_doi(tree_var, focus_node_id, min_doi);
+  tree_var = filter_doi(tree_var);
+  tree_var = segment_tree(tree_var);
+
+  var tree_layout = d3.layout.cluster();
+  var nodes = tree_layout.nodeSize(node_size)
+      .nodes(tree_var);
+  var cur_size = get_layout_size(nodes);
+  if (cur_size[0] > display_dim[0]) {
+    tree_var = trim_width(tree_var, display_dim, node_size);
+  }
+  if (cur_size[1] > display_dim[1]) {
+    tree_var = trim_height(tree_var, display_dim, node_size);
+  }
+  
+  var tree_layout = d3.layout.cluster();
+  var nodes = tree_layout.nodeSize(node_size)
+      .nodes(tree_var);
+  return {"tree_var": tree_var, "nodes": nodes}
+}
+
+function trim_height(tree_var) {
+  return tree_var;
+}
+
+function get_block_dois(tree_var) {
+  var nodes = d3.layout.tree()
+      .nodes(tree_var);
+
+  var block_dois = {};
+  for (var i = 0; i < nodes.length; i++) {
+    cur_depth = nodes[i].depth
+    cur_segment = nodes[i].segment
+
+    if(Object.keys(block_dois).indexOf("" + cur_depth) == -1) {
+      block_dois[cur_depth] = {}
+    }
+
+    if (Object.keys(block_dois[cur_depth]).indexOf("" + cur_segment) == -1) {
+      block_dois[cur_depth][cur_segment] = [nodes[i].doi];
+    } else {
+      block_dois[cur_depth][cur_segment].push(nodes[i].doi);
+    }
+  }
+
+  return block_dois;
+}
+
+function average_block_dois(tree_var) {
+  var block_dois = get_block_dois(tree_var);
+  var depths = Object.keys(block_dois).map(parseFloat);
+
+  var averages_values = [];
+  var averages_segments = [];
+  var averages_depths = [];
+  for (var i = 0; i <= d3.max(depths); i++) {
+    var segments = Object.keys(block_dois[i]).map(parseFloat);
+    for (var j = 0; j <= d3.max(segments); j++) {
+      averages_depths.push(i)
+      averages_segments.push(j)
+      averages_values.push(d3.mean(block_dois[i][j]));
+    }
+  }
+  return {"depths": averages_depths,
+	  "segments": averages_segments,
+	  "values": averages_values};
+}
+
+function trim_width(tree_var, max_width, node_size) {
+  var average_dois = average_block_dois(tree_var);
+  var sorted_dois = average_dois.values
+      .concat()
+      .sort(function(a, b) {
+	return a - b;
+      })
+  sorted_dois = _.uniq(sorted_dois);
+  
+  for (var i = 0; i < sorted_dois.length; i++) {
+
+    var nodes = d3.layout.cluster()
+	.nodeSize(node_size)
+	.nodes(tree_var);
+    console.log(nodes);
+    cur_size = get_layout_size(nodes);
+    if (cur_size[0] < max_width) break;
+
+    for (var j = 0; j < average_dois.values.length; j++) {
+      if (average_dois.values[j] == sorted_dois[i]) {
+	tree_var = filter_block(tree_var, average_dois.depths[j], average_dois.segments[j]);
+      }
+    }
+
+  }
   return tree_var;
 }
