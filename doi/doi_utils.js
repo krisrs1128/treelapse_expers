@@ -155,9 +155,9 @@ function set_node_segments(nodes, depths) {
  * that modifying the nodes variable [associated with a
  * d3.layout.tree() modifies the tree from which it was created.
  * 
- * @param {Object} tree_var A tree structured object, of the kind created by d3's
- * tree and hierarchy functions. This is the object that will be
- * segmented.
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions. This is the object that
+ * will be segmented.
  * @return {Object} tree_var The original tree_var object, but with
  * with a new .segment attribute within each subject, giving the
  * segment needed by the TreeBlock algorithm.
@@ -171,7 +171,31 @@ function segment_tree(tree_var) {
   return tree_var;
 }
 
-function get_layout_size(nodes) {
+/** 
+ * Get the breadth and width associated with a tree + node_size
+ * 
+ * During the tree-blocking algorithm, we repeatedly query for the
+ * width and breadth of successive trimmings of the tree. This
+ * function calculates the space that a particular trimmed version of
+ * the tree takes up. Note that it uses a dendrogram layout, instead
+ * of a reingold-tilford layout [d3.layout.tree()], because the
+ * reingold-tilford layout width does not change until you remove full
+ * layers.
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions.
+ * @param {array} node_size A length 2 array giving the width and
+ * height of the rectangle reserved for a single node.
+ * @return {array} A length 2 array giving the width and height of
+ * result tree.
+ * @examples
+ * get_layout_size(tax_tree, [4, 50])
+ **/ 
+function get_layout_size(tree_var, node_size) {
+  var nodes = d3.layout.cluster()
+      .nodeSize(node_size)
+      .nodes(tree_var);
+
   var nodes_pos = {"x": nodes.map(function(d) { return d.x }),
 		   "y": nodes.map(function(d) { return d.y })}
   return [d3.max(nodes_pos.x) - d3.min(nodes_pos.x),
@@ -179,6 +203,19 @@ function get_layout_size(nodes) {
 }
 
 // filter away nodes that don't have a doi assigned to them
+/** 
+ * Filter away nodes unassociated with a DOI
+ * 
+ * We use the fact that, when setting the DOI, we don't assign a doi
+ * to nodes with doi below a minimum threshold. Therefore, to reduce
+ * the tree to nodes with doi above the threshold, we just need to
+ * remove nodes with an unspecified doi.
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions.
+ * @return {Object} tree_var The same object, but after removing any
+ * nodes below the minimum threshold removed.
+ **/
 function filter_doi(tree_var) {
   if (Object.keys(tree_var).indexOf("children") != -1) {
     for (var i = 0; i < tree_var.children.length; i++) {
@@ -190,83 +227,102 @@ function filter_doi(tree_var) {
   return tree_var;
 }
 
-// filter away nodes in a certain block / in a certain segment
+/** 
+ * Filter nodes within a single tree block
+ *
+ * The tree-blocking algorithm requires filtering away blocks of
+ * nodes, according to their degree-of-interest. This function filters
+ * away a single block from the input tree structure, as specified by
+ * the depth and segment position of the block (see tree_segment())
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions.
+ * @param {int} depth The depth in the tree to filter away.
+ * @param {int} segment The segment at the specified depth to filter
+ * away.
+ * @return {Object} tree_var The original tree_var object, but with
+ * the single specified block filtered out.
+ **/ 
 function filter_block(tree_var, depth, segment) {
   if (tree_var.depth == depth && tree_var.segment == segment) {
     return;
   }
 
   if (Object.keys(tree_var).indexOf("children") != -1) {
-    var filtered_children = []
+    var subtree = []
     for (var i = 0; i < tree_var.children.length; i++) {
       var filtered = filter_block(tree_var.children[i], depth, segment);
       if (typeof filtered != "undefined") {
-	filtered_children.push(filtered);
+	subtree.push(filtered);
       }
     }
-    tree_var.children = filtered_children;
+    tree_var.children = subtree;
   }
   return tree_var;
 }
 
-function tree_block(tree_var, focus_node_id, min_doi = -10,
-		    display_dim = [500, 500],
-		    node_size = [4, 10]) {
-  tree_var = set_doi(tree_var, focus_node_id, min_doi);
-  tree_var = filter_doi(tree_var);
-  tree_var = segment_tree(tree_var);
-
-  var tree_layout = d3.layout.cluster();
-  var nodes = tree_layout.nodeSize(node_size)
-      .nodes(tree_var);
-  var cur_size = get_layout_size(nodes);
-  if (cur_size[0] > display_dim[0]) {
-    tree_var = trim_width(tree_var, display_dim, node_size);
-  }
-  if (cur_size[1] > display_dim[1]) {
-    tree_var = trim_height(tree_var, display_dim, node_size);
-  }
-  
-  var tree_layout = d3.layout.cluster();
-  var nodes = tree_layout.nodeSize(node_size)
-      .nodes(tree_var);
-  return {"tree_var": tree_var, "nodes": nodes}
-}
-
-function trim_height(tree_var) {
-  return tree_var;
-}
-
+/**
+ * Rearrange dois along trees into blocks
+ * 
+ * For the tree-blocking algorithm, it is convenient to store the DOIs
+ * into a depth x segment object.
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions. This is assumed to have
+ * a "depth" and a "segment" field already included.
+ * @return {Object} block_dois An object keyed by depths. At each
+ * depth, the value is another object, keyed by segments. For each
+ * block-segment combination, an array of DOIs for that block in the
+ * tree is returned.
+ **/
 function get_block_dois(tree_var) {
-  var nodes = d3.layout.tree()
+  var nodes = d3.layout.cluster()
       .nodes(tree_var);
 
   var block_dois = {};
+  unique_depths = _.uniq(nodes.map(function(d) { return d.depth }));
+
+  // initialize structure to store dois
+  for (var i = 0; i < unique_depths.length; i++) {
+    block_dois[i] = {};
+    cur_nodes = nodes.filter(function(d) { return d.depth == i });
+    unique_segments = _.uniq(cur_nodes.map(function(d) { return d.segment; }));
+    for (var j = 0; j < unique_segments.length; j++) {
+      block_dois[i][j] = [];
+    }
+  }
+
+  // fill in actual values
   for (var i = 0; i < nodes.length; i++) {
     cur_depth = nodes[i].depth
     cur_segment = nodes[i].segment
-
-    if(Object.keys(block_dois).indexOf("" + cur_depth) == -1) {
-      block_dois[cur_depth] = {}
-    }
-
-    if (Object.keys(block_dois[cur_depth]).indexOf("" + cur_segment) == -1) {
-      block_dois[cur_depth][cur_segment] = [nodes[i].doi];
-    } else {
-      block_dois[cur_depth][cur_segment].push(nodes[i].doi);
-    }
+    block_dois[cur_depth][cur_segment].push(nodes[i].doi);
   }
 
   return block_dois;
 }
 
+/**
+ * Compute the average DOI in each block
+ * 
+ * To summarize the importance of displaying any particular block, it
+ * is useful to be able to retrieve the average doi within blocks.
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions. This is assumed to have
+ * a "depth" and a "segment" field already included.
+ * @return {Object} An object with the average dois for each block
+ * contained in a .values element. The .depths and .segments blocks
+ * specify the block and segment indices associated with each average
+ * doi.
+ **/ 
 function average_block_dois(tree_var) {
   var block_dois = get_block_dois(tree_var);
-  var depths = Object.keys(block_dois).map(parseFloat);
+  var averages_values = [],
+      averages_segments = [],
+      averages_depths = [];
 
-  var averages_values = [];
-  var averages_segments = [];
-  var averages_depths = [];
+  var depths = Object.keys(block_dois).map(parseFloat);
   for (var i = 0; i <= d3.max(depths); i++) {
     var segments = Object.keys(block_dois[i]).map(parseFloat);
     for (var j = 0; j <= d3.max(segments); j++) {
@@ -275,29 +331,42 @@ function average_block_dois(tree_var) {
       averages_values.push(d3.mean(block_dois[i][j]));
     }
   }
+
   return {"depths": averages_depths,
 	  "segments": averages_segments,
 	  "values": averages_values};
 }
 
+/** 
+ * Trim the width of a tree until it fits within a certain width
+ * 
+ * This implements the breadth-trimming strategy described in the
+ * DOI revisited paper (there are some differences in details). The
+ * specific strategy here is to sort blocks (which we take to be
+ * groups of sibling nodes) according to DOI, and filter them from
+ * lowest to highest DOI, until the width of the resulting layout is
+ * below the specified max_width.
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions.
+ * @param max_width The maximum allowed width of the tree layout.
+ * @param {array} node_size A length 2 array giving the width and
+ * height of the rectangle reserved for a single node.
+ * @reference http://vis.stanford.edu/files/2004-DOITree-AVI.pdf
+ **/ 
 function trim_width(tree_var, max_width, node_size) {
   var average_dois = average_block_dois(tree_var);
   var sorted_dois = average_dois.values
       .concat()
-      .sort(function(a, b) {
-	return a - b;
-      })
+      .sort(function(a, b) { return a - b; });
   sorted_dois = _.uniq(sorted_dois);
   
+  // iterate over DOIs, starting with the smallest
   for (var i = 0; i < sorted_dois.length; i++) {
-
-    var nodes = d3.layout.cluster()
-	.nodeSize(node_size)
-	.nodes(tree_var);
-    console.log(nodes);
-    cur_size = get_layout_size(nodes);
+    cur_size = get_layout_size(tree_var, node_size);
     if (cur_size[0] < max_width) break;
 
+    // find all blocks with the current DOI value
     for (var j = 0; j < average_dois.values.length; j++) {
       if (average_dois.values[j] == sorted_dois[i]) {
 	tree_var = filter_block(tree_var, average_dois.depths[j], average_dois.segments[j]);
@@ -306,4 +375,51 @@ function trim_width(tree_var, max_width, node_size) {
 
   }
   return tree_var;
+}
+
+/** 
+ * Trim the height of the tree, according to DOI 
+ *
+ * This is not implemented yet. It's not strictly necessary, if we
+ * allow panning and give breadcrumbs.
+ **/ 
+function trim_height(tree_var) {
+  return tree_var;
+}
+
+/**
+ * Wrapper to perform overall tree blocking algorithm
+ * 
+ * @param {Object} tree_var A tree structured object, of the kind
+ * used by d3's tree and hierarchy functions.
+ * @param 
+ * @param {string} focus_node_id A string specifying the .name field in
+ * the object that will be considered the "focus" node, around which to
+ * set the doi distibution.
+ * @param {float} min_doi The minimum doi at which point we stop traversing the
+ * tree. This can save computation when navigating very large trees.
+ * @param {array} node_size A length 2 array giving the width and
+ * height of the rectangle reserved for a single node.
+ *
+ * @return The filtered tree and nodes.
+ **/
+function tree_block(tree_var, focus_node_id, min_doi = -10,
+		    display_dim = [500, 500],
+		    node_size = [4, 10]) {
+  tree_var = set_doi(tree_var, focus_node_id, min_doi);
+  tree_var = filter_doi(tree_var);
+  tree_var = segment_tree(tree_var);
+
+  var cur_size = get_layout_size(tree_var, node_size);
+  if (cur_size[0] > display_dim[0]) {
+    tree_var = trim_width(tree_var, display_dim[0], node_size);
+  }
+  if (cur_size[1] > display_dim[1]) {
+    tree_var = trim_height(tree_var, display_dim[1], node_size);
+  }
+
+  var nodes = d3.layout.cluster()
+      .nodeSize(node_size)
+      .nodes(tree_var);
+  return {"tree_var": tree_var, "nodes": nodes}
 }

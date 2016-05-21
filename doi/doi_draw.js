@@ -3,40 +3,28 @@
 // are following http://vis.stanford.edu/papers/doitrees-revisited
 //////////////////////////////////////////////////////////////////////
 
-var node_size = [4, 50]
+var height = 500,
+    width = 500
+var node_size = [4, 40]
 
-var tree = d3.layout.cluster()
-var nodes = tree.nodeSize(node_size)
+var nodes = d3.layout.cluster()
+    .nodeSize(node_size)
     .nodes(tax_tree); // this actually modifies the tax tree variable
 
-console.log(tax_tree)
-var tax_tree2 = segment_tree(tax_tree)
-tax_tree2 = set_doi(tax_tree2, "O:O:Bacteroidales", -12)
+var res = tree_block(tax_tree, "F:F:Micrococcaceae", -10,
+		     [width, height], node_size);
+nodes = res.nodes;
 
-tax_tree2 = trim_width(tax_tree2, 500, node_size)
-
-depth_scale = d3.scale.linear()
-  .domain([0, 7])
-  .range([0, 500])
-
-nodes = tree.nodeSize(node_size)
-  .nodes(tax_tree2);
-
+var x_extent = d3.extent(nodes.map(function(d) { return d.x }));
 for (var i = 0; i < nodes.length; i++) {
-  nodes[i].x += 450;
-  nodes[i].y = depth_scale(nodes[i].depth);
+  nodes[i].x += (x_extent[1] - x_extent[0]) / 2
+  nodes[i].y = nodes[i].depth * node_size[1];
 }
 
-var nodes_pos = {"x": nodes.map(function(d) { return d.x }),
-		 "y": nodes.map(function(d) { return d.y })}
-
-var links = tree.links(nodes)
-
+var links = d3.layout.cluster()
+    .links(nodes)
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.x, d.y]})
-
-var height = 800,
-    width = 1500
 
 // just draw it for fun
 var svg_elem = d3.select("body")
