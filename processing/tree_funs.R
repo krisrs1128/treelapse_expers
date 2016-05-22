@@ -136,7 +136,10 @@ tree_counts_multi <- function(el, mapping, counts, sample_info) {
         round(digits = 2)
     }
   }
-  unfold_counts_list(counts_list)
+  counts_list <- counts_list %>%
+    unfold_counts_list()
+  names(counts_list) <- unique_subjects
+  counts_list
 }
 
 # @title Utility used to unwrap the matrix in tree_counts_multi() into a list
