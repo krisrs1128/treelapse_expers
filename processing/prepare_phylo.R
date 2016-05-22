@@ -46,9 +46,18 @@ sample_info <- sample_data(PS)
 names(sample_info@.Data) <- colnames(sample_info)
 sample_info$sample_id <- rownames(sample_info)
 
+sample_info$date_tmp <- strptime(sample_info$DateColl, "%m/%d/%y %H:%M") %>%
+  as.numeric()
 sample_info <- sample_info %>%
   data.frame() %>%
-  filter(BodySite == "Vaginal_Swab", SubjectID == "10032") %>%
+  arrange(SubjectID, date_tmp) %>%
+  group_by(SubjectID) %>%
+  mutate(order = 1:n())
+
+sample_info <- sample_info %>%
+  filter(BodySite == "Vaginal_Swab", SubjectID %in% c("19009",
+                                                      "19010"),
+         order %in% 10:30) %>%
   select(sample_id, DateColl, SubjectID)
 colnames(sample_info) <- c("sample_id", "date", "subject")
 
@@ -85,7 +94,7 @@ tax_tree <- tree_from_taxa(tax)
 tax_abund <- tree_counts_multi(as.matrix(tax_tree$el),
                                tax_tree$inv_mapping,
                                counts, sample_info)
-sprintf("var tax_abund = %s", toJSON(phy_abund, auto_unbox = T)) %>%
+sprintf("var tax_abund = %s", toJSON(tax_abund, auto_unbox = T)) %>%
   cat(file = file.path("data", "tax_abund.js"))
 
 ## ---- phy-json ----
