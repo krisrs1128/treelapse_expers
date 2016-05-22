@@ -164,11 +164,30 @@ function set_node_segments(nodes, depths) {
  * @reference http://vis.stanford.edu/papers/doitrees-revisited
  **/ 
 function segment_tree(tree_var) {
-  var tree_layout = d3.layout.cluster();
-  var nodes = tree_layout.nodes(tree_var);
-  depths = nodes.map(function(d) { return d.depth });
+  var nodes = d3.layout.cluster()
+      .nodes(tree_var);
+  var depths = nodes.map(function(d) { return d.depth });
   nodes = set_node_segments(nodes, depths);
   return tree_var;
+}
+
+/**
+ * Get tree node positions
+ **/ 
+function get_layout(tree_var, focus_node_id, display_dim, node_size) {
+  var nodes = d3.layout.cluster()
+      .nodeSize(node_size)
+      .nodes(tree_var);
+  var focus = nodes.filter(function(d) {
+    return d.name == focus_node_id; })[0]; 
+  var focus_move = {"dx": focus.x - display_dim[0] / 2,
+		    "dy": focus.y - 1 * display_dim[1] / 3};
+
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].x -= focus_move.dx;
+    nodes[i].y -= focus_move.dy;
+  }
+  return nodes;
 }
 
 /** 
@@ -188,21 +207,15 @@ function segment_tree(tree_var) {
  * height of the rectangle reserved for a single node.
  * @return {array} A length 2 array giving the width and height of
  * result tree.
- * @examples
- * get_layout_size(tax_tree, [4, 50])
  **/ 
-function get_layout_size(tree_var, node_size) {
-  var nodes = d3.layout.cluster()
-      .nodeSize(node_size)
-      .nodes(tree_var);
-
+function get_layout_bounds(tree_var, focus_node_id, display_dim, node_size) {
+  var nodes = get_layout(tree_var, focus_node_id, display_dim, node_size);
   var nodes_pos = {"x": nodes.map(function(d) { return d.x }),
-		   "y": nodes.map(function(d) { return d.y })}
-  return [d3.max(nodes_pos.x) - d3.min(nodes_pos.x),
-	  d3.max(nodes_pos.y) - d3.min(nodes_pos.y)];
+		   "y": nodes.map(function(d) { return d.y })};
+  return {"x_min": d3.min(nodes_pos.x), "x_max": d3.max(nodes_pos.x),
+	  "y_min": d3.min(nodes_pos.y), "y_max": d3.max(nodes_pos.y)};
 }
 
-// filter away nodes that don't have a doi assigned to them
 /** 
  * Filter away nodes unassociated with a DOI
  * 
@@ -354,7 +367,7 @@ function average_block_dois(tree_var) {
  * height of the rectangle reserved for a single node.
  * @reference http://vis.stanford.edu/files/2004-DOITree-AVI.pdf
  **/ 
-function trim_width(tree_var, max_width, node_size) {
+function trim_width(tree_var, focus_node_id, display_dim, node_size) {
   var average_dois = average_block_dois(tree_var);
   var sorted_dois = average_dois.values
       .concat()
@@ -363,9 +376,12 @@ function trim_width(tree_var, max_width, node_size) {
   
   // iterate over DOIs, starting with the smallest
   for (var i = 0; i < sorted_dois.length; i++) {
-    cur_size = get_layout_size(tree_var, node_size);
-    if (cur_size[0] < max_width) break;
-
+    cur_bounds = get_layout_bounds(tree_var, focus_node_id,
+				   display_dim, node_size);
+    if (cur_bounds.x_max < display_dim[0] & cur_bounds.x_min > 0) {
+      break;
+    }
+    
     // find all blocks with the current DOI value
     for (var j = 0; j < average_dois.values.length; j++) {
       if (average_dois.values[j] == sorted_dois[i]) {
@@ -403,23 +419,33 @@ function trim_height(tree_var) {
  *
  * @return The filtered tree and nodes.
  **/
-function tree_block(tree_var, focus_node_id, min_doi = -10,
+function tree_block(tree_var0, focus_node_id, min_doi = -10,
 		    display_dim = [500, 500],
 		    node_size = [4, 10]) {
+  var tree_var = jQuery.extend(true, {}, tree_var0);
+  tree_var = supplement_tree(tree_var);
   tree_var = set_doi(tree_var, focus_node_id, min_doi);
   tree_var = filter_doi(tree_var);
   tree_var = segment_tree(tree_var);
 
-  var cur_size = get_layout_size(tree_var, node_size);
-  if (cur_size[0] > display_dim[0]) {
-    tree_var = trim_width(tree_var, display_dim[0], node_size);
+  var cur_bounds = get_layout_bounds(tree_var, focus_node_id,
+				   display_dim, node_size);
+  if (cur_bounds.x_min < 0 || cur_bounds.x_max > display_dim[0]) {
+    tree_var = trim_width(tree_var, focus_node_id, display_dim, node_size); 
   }
-  if (cur_size[1] > display_dim[1]) {
-    tree_var = trim_height(tree_var, display_dim[1], node_size);
+  if (cur_bounds.y_min < 0 || cur_bounds.y_max > display_dim[1]) {
+    tree_var = trim_height(tree_var, display_dim, node_size);
   }
 
-  var nodes = d3.layout.cluster()
-      .nodeSize(node_size)
-      .nodes(tree_var);
+  var nodes = get_layout(tree_var, focus_node_id, display_dim, node_size);
   return {"tree_var": tree_var, "nodes": nodes}
+}
+
+function supplement_tree(tax_tree) {
+  var supp_nodes = d3.layout.cluster()
+      .nodes(tax_tree); // this actually modifies the tax tree variable
+  for (var i = 0; i < supp_nodes.length; i++) {
+    supp_nodes[i].hidden_desc = false;
+  }
+  return tax_tree;
 }
