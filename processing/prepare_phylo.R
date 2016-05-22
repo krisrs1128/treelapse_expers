@@ -39,7 +39,9 @@ load(tmp)
 
 ## ---- k-over-a-filter ----
 PS <- PS %>%
+  subset_samples(SubjectID %in% c("19009", "19010")) %>%
   filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
+
 
 ## --- sample data ----
 sample_info <- sample_data(PS)
@@ -55,9 +57,6 @@ sample_info <- sample_info %>%
   mutate(order = 1:n())
 
 sample_info <- sample_info %>%
-  filter(BodySite == "Vaginal_Swab", SubjectID %in% c("19009",
-                                                      "19010"),
-         order %in% 10:30) %>%
   select(sample_id, DateColl, SubjectID)
 colnames(sample_info) <- c("sample_id", "date", "subject")
 
