@@ -34,7 +34,7 @@ function set_doi(tree_var, focus_node_id, min_doi) {
       }
     }
   } else {
-    tree_var = set_tree_fisheye(tree_var, -1, min_doi);
+    tree_var = set_tree_fisheye(tree_var, -1);
   }
   return tree_var;
 }
@@ -83,14 +83,14 @@ function contains_node(tree_var, node_id) {
  * @example
  * test_doi = set_doi(tax_tree, "K:Bacteria", -10)
  **/ 
-function set_tree_fisheye(tree_var, doi, min_doi) {
+function set_tree_fisheye(tree_var, doi) {
   if (tree_var.doi == undefined) {
     tree_var.doi = doi;
   }
 
-  if (tree_var.children != undefined && doi > min_doi) {
+  if (tree_var.children != undefined) {
     for (var i = 0; i < tree_var.children.length; i++) {
-      tree_var.children[i] = set_tree_fisheye(tree_var.children[i], doi - 1, min_doi);
+      tree_var.children[i] = set_tree_fisheye(tree_var.children[i], doi - 1);
     }
   }
   return tree_var;
@@ -181,11 +181,12 @@ function get_layout(tree_var, focus_node_id, display_dim, node_size) {
   var focus = nodes.filter(function(d) {
     return d.name == focus_node_id; })[0]; 
   var focus_move = {"dx": focus.x - display_dim[0] / 2,
-		    "dy": focus.y - 1 * display_dim[1] / 3};
+		    "d_depth": focus.depth}
 
   for (var i = 0; i < nodes.length; i++) {
     nodes[i].x -= focus_move.dx;
-    nodes[i].y -= focus_move.dy;
+    nodes[i].y = node_size[1] * (nodes[i].depth - focus.depth) +
+      display_dim[1] / 3
   }
   return nodes;
 }
@@ -229,15 +230,31 @@ function get_layout_bounds(tree_var, focus_node_id, display_dim, node_size) {
  * @return {Object} tree_var The same object, but after removing any
  * nodes below the minimum threshold removed.
  **/
-function filter_doi(tree_var) {
-  if (Object.keys(tree_var).indexOf("children") != -1) {
-    for (var i = 0; i < tree_var.children.length; i++) {
-      if (Object.keys(tree_var.children[i]).indexOf("doi") != -1) {
-	tree_var.children[i] = filter_doi(tree_var.children[i]);
+function filter_doi(tree_var, min_doi) {
+  var keys = Object.keys(tree_var)
+  if (keys.indexOf("children") != -1) {
+    var children_copy = tree_var.children.slice();
+    tree_var.children = []
+
+    for (var i = 0; i < children_copy.length; i++) {
+      if (children_copy[i].doi >= min_doi) {
+	tree_var.children.push(filter_doi(children_copy[i], min_doi));
       }
     }
   }
-  return tree_var;
+
+  var tree_var_res = {}
+  for (var k = 0; k < keys.length; k++) {
+    if (keys[k] != "children") {
+      tree_var_res[keys[k]] = tree_var[keys[k]];
+    } else {
+      if (tree_var.children.length > 0) {
+	tree_var_res[keys[k]] = tree_var[keys[k]];
+      }      
+    }
+  }
+  
+  return tree_var_res;
 }
 
 /** 
@@ -423,13 +440,13 @@ function tree_block(tree_var0, focus_node_id, min_doi = -10,
 		    display_dim = [500, 500],
 		    node_size = [4, 10]) {
   var tree_var = jQuery.extend(true, {}, tree_var0);
-  tree_var = supplement_tree(tree_var);
+  tree_var = supplement_tree(tree_var, 0);
   tree_var = set_doi(tree_var, focus_node_id, min_doi);
-  tree_var = filter_doi(tree_var);
+  tree_var = filter_doi(tree_var, min_doi);
   tree_var = segment_tree(tree_var);
 
   var cur_bounds = get_layout_bounds(tree_var, focus_node_id,
-				   display_dim, node_size);
+				     display_dim, node_size);
   if (cur_bounds.x_min < 0 || cur_bounds.x_max > display_dim[0]) {
     tree_var = trim_width(tree_var, focus_node_id, display_dim, node_size); 
   }
@@ -441,11 +458,14 @@ function tree_block(tree_var0, focus_node_id, min_doi = -10,
   return {"tree_var": tree_var, "nodes": nodes}
 }
 
-function supplement_tree(tax_tree) {
-  var supp_nodes = d3.layout.cluster()
-      .nodes(tax_tree); // this actually modifies the tax tree variable
-  for (var i = 0; i < supp_nodes.length; i++) {
-    supp_nodes[i].hidden_desc = false;
+function supplement_tree(tree_var, depth) {
+  tree_var.depth = depth;
+  tree_var.hidden_desc = false;
+  if (Object.keys(tree_var).indexOf("children") != -1) {
+    for (var i = 0; i < tree_var.children.length; i++) {
+      tree_var.children[i] = supplement_tree(tree_var.children[i],
+					     depth + 1);
+    }
   }
-  return tax_tree;
+  return tree_var;
 }
