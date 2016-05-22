@@ -1,6 +1,5 @@
 
-function doi_update(tree_var, min_doi, display_dim,
-		    node_size) {
+function doi_update(tree_var, display_dim, node_size) {
   var layout = tree_block(tree_var, focus_node_id, min_doi,
 			  display_dim, node_size);
   
@@ -40,7 +39,7 @@ function doi_update(tree_var, min_doi, display_dim,
     .on("click",
 	function(d) {
 	  focus_node_id = d.name;
-	  doi_update(tax_tree, min_doi, display_dim, node_size);
+	  doi_update(tax_tree, display_dim, node_size);
 	});
 
   link_selection

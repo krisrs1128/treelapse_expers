@@ -25,20 +25,20 @@ var display_dim = [width, height];
 d3.select("#min_doi")
   .on("input", function() {
     min_doi = this.value
-    doi_update(tax_tree, min_doi, display_dim, node_size);
+    doi_update(tax_tree, display_dim, node_size);
   });
 
 d3.select("#node_x")
   .on("input", function() {
     node_size[0] = this.value
-    doi_update(tax_tree, min_doi, display_dim, node_size);
+    doi_update(tax_tree, display_dim, node_size);
   });
 
 d3.select("#node_y")
   .on("input", function() {
     node_size[1] = this.value
-    doi_update(tax_tree, min_doi, display_dim, node_size);
+    doi_update(tax_tree, display_dim, node_size);
   });
 
 
-doi_update(tax_tree, min_doi, display_dim, node_size);
+doi_update(tax_tree, display_dim, node_size);

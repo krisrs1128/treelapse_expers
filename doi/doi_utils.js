@@ -121,7 +121,7 @@ function filter_depth(x, i) {
  * attribute added to each node.
  **/ 
 function set_node_segments(nodes, depths) {
-  // set 0 for root [any nodes at deoth 0]
+  // set 0 for root [any nodes at depth 0]
   for (var i = 0; i < nodes.length; i++) {
     if (nodes[i].depth == 0) {
       nodes[i].segment = 0;
@@ -135,7 +135,7 @@ function set_node_segments(nodes, depths) {
     
     // iterate over nodes at this depth
     for (var j = 0; j < children.length; j++) {
-      var cur_ix = nodes.map(function(d) { return d.name})
+      var cur_ix = nodes.map(function(d) { return d.name })
 	  .indexOf(children[j].name);
       nodes[cur_ix].segment = parents.indexOf(children[j].parent.name);
     }
@@ -180,11 +180,10 @@ function get_layout(tree_var, focus_node_id, display_dim, node_size) {
       .nodes(tree_var);
   var focus = nodes.filter(function(d) {
     return d.name == focus_node_id; })[0]; 
-  var focus_move = {"dx": focus.x - display_dim[0] / 2,
-		    "d_depth": focus.depth}
+  var x_move = focus.x - display_dim[0] / 2
 
   for (var i = 0; i < nodes.length; i++) {
-    nodes[i].x -= focus_move.dx;
+    nodes[i].x -= x_move
     nodes[i].y = node_size[1] * (nodes[i].depth - focus.depth) +
       display_dim[1] / 3
   }
@@ -318,7 +317,7 @@ function get_block_dois(tree_var) {
     cur_nodes = nodes.filter(function(d) { return d.depth == i });
     unique_segments = _.uniq(cur_nodes.map(function(d) { return d.segment; }));
     for (var j = 0; j < unique_segments.length; j++) {
-      block_dois[i][j] = [];
+      block_dois[unique_depths[i]][unique_segments[j]] = [];
     }
   }
 
@@ -352,13 +351,13 @@ function average_block_dois(tree_var) {
       averages_segments = [],
       averages_depths = [];
 
-  var depths = Object.keys(block_dois).map(parseFloat);
-  for (var i = 0; i <= d3.max(depths); i++) {
-    var segments = Object.keys(block_dois[i]).map(parseFloat);
-    for (var j = 0; j <= d3.max(segments); j++) {
-      averages_depths.push(i)
-      averages_segments.push(j)
-      averages_values.push(d3.mean(block_dois[i][j]));
+  var depths = Object.keys(block_dois);
+  for (var i = 0; i < depths.length; i++) {
+    var segments = Object.keys(block_dois[i]);
+    for (var j = 0; j < segments.length; j++) {
+      averages_depths.push(depths[i])
+      averages_segments.push(segments[j])
+      averages_values.push(d3.mean(block_dois[depths[i]][segments[j]]));
     }
   }
 
