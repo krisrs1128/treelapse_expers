@@ -42,7 +42,6 @@ PS <- PS %>%
   subset_samples(SubjectID %in% c("19009", "19010")) %>%
   filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
 
-
 ## --- sample data ----
 sample_info <- sample_data(PS)
 names(sample_info@.Data) <- colnames(sample_info)
@@ -82,10 +81,10 @@ sprintf("var phy_abund = %s", toJSON(phy_abund, auto_unbox = T)) %>%
 
 ## ---- taxonomy-tree ----
 tax <- tax_table(PS)@.Data
-for (j in seq_len(ncol(tax))) {
-  prefix <- substr(colnames(tax)[j], 1, 1)
-  tax[, j] <- paste0(prefix, ":", tax[, j])
+for (i in seq_len(nrow(tax))) {
+  tax[i, ] <- make.names(tax[i, ], unique = TRUE)
 }
+
 tax <- cbind(tax, OTU = rownames(tax))
 tax_tree <- tree_from_taxa(tax)
 
@@ -114,6 +113,6 @@ el <- tax_tree$el
 el[, 1] <- tax_tree$inv_mapping[el[, 1]]
 el[, 2] <- tax_tree$inv_mapping[el[, 2]]
 colnames(el) <- c("parent", "child")
-res <- tree_json(el, "K:Bacteria")
+res <- tree_json(el, "Bacteria")
 sprintf("var tax_tree = %s", toJSON(res, auto_unbox = T)) %>%
   cat(file = file.path("data", "tax_tree.js"))
