@@ -14,7 +14,7 @@ function doi_update() {
   console.log(max_abund);
   var scales = {"size": d3.scale.linear()
 		.domain([0, max_abund])
-		.range([.3, 6])};
+		.range([.7, 13])};
   console.log(scales.size(4));
 
 
@@ -78,18 +78,15 @@ function doi_update() {
       return diagonal({"source": source, "target": target})
     }})
     .style({"opacity": 1})
-  
+
   node_selection
     .transition()
     .duration(1000)
     .attr({"cx": function(d) { return d.x },
 	   "cy": function(d) { return d.y},
 	   "r": function(d) {
-	     var values = []
-	     for (var time_id in abund_var[d.name]) {
-	       values.push(abund_var[d.name][time_id].value);
-	     }
-	     return scales.size(d3.mean(values))
+	     var abunds = get_abunds(abund_var, d.name); 
+	     return scales.size(d3.mean(abunds));
 	   }})
     .style({"opacity": 1,
 	    "stroke": "red",
@@ -100,7 +97,12 @@ function doi_update() {
 		return 0;
 	      }},
 	    "fill": function(d) {
-	      return col_scale(d.doi) }});
+	      var abunds = get_abunds(abund_var, d.name);
+	      if (d3.mean(abunds) == 0) {
+		return "black"
+	      }
+	      return col_scale(d.doi)
+	    }});
 
   text_selection
     .transition()

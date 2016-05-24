@@ -468,3 +468,11 @@ function supplement_tree(tree_var, depth) {
   }
   return tree_var;
 }
+
+function get_abunds(abund_var, otu_id) {
+  var values = []
+  for (var time_id in abund_var[otu_id]) {
+    values.push(abund_var[otu_id][time_id].value);
+  }
+  return values;
+}
