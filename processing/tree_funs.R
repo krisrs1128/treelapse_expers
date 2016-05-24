@@ -114,7 +114,8 @@ tree_from_taxa <- function(taxa) {
 # across subjects and times.
 # See processing/prepare_phylo.R for an example application.
 tree_counts_multi <- function(el, mapping, counts, sample_info) {
-  unique_dates <- unique(sample_info$rel_day)
+  unique_dates <- unique(sample_info$rel_day) %>%
+    sort()
   unique_subjects <- unique(sample_info$subject)
   
   one_otu_mat <- matrix(0, nrow = length(mapping),
