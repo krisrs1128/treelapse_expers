@@ -190,9 +190,9 @@ function doi_update() {
 	   },
 	   "font-size": function(d) {
 	     if(d.doi == 0) {
-	       return 7
+	       return 12
 	     } else {
-	       return 5
+	       return 7
 	     }}})
     .style({"opacity":  function(d) {
 	     if(d.doi == 0) {
