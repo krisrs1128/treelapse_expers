@@ -22,7 +22,7 @@ function doi_update() {
   var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.x, d.y]})
   var highlighted_links = links.filter(function(d) {
-    return highlight_ids.indexOf(d.target.name) != -1
+    return (highlight_ids.indexOf(d.target.name) != -1) || (d.doi == 0);
   });
 
   var highlighted_link_selection = d3.select("#highlight-links")
@@ -52,7 +52,12 @@ function doi_update() {
     .append("path", "g")
     .classed("tree_highlight", true)
     .style({"opacity": 0,
-	    "stroke": "#F25359"});
+	    "stroke": function(d) { 
+	      if (highlight_ids.indexOf(d.name) != -1) {
+		return "#F25359";
+	      } else {
+		return "#A878C4";
+	      }}});
 
   link_selection.enter()
     .append("path", "g")
@@ -66,7 +71,21 @@ function doi_update() {
     .attr({"id": function(d) { return "node-" + d.name; }})
     .style({"opacity": 0,
 	    "stroke-width": 0,
-	    "fill": function(d) { return scales.col(d.doi) }})
+	    "stroke": function(d) {
+	      if (d.doi == 0) {
+		return "#A878C4"
+	      } else if (highlight_ids.indexOf(d.name) != -1) {
+		return "#F25359"
+	      } else {
+		return "black";
+	      }},
+	    "fill": function(d) {
+	      var abunds = get_abunds(abund_var, d.name);
+	      if (d3.mean(abunds) == 0) {
+		return "black"
+	      }
+	      return scales.col(d.doi)
+	    }})
     .on("click",
 	function(d) {
 	  focus_node_id = d.name;
@@ -87,13 +106,22 @@ function doi_update() {
       return diagonal({"source": source, "target": target})
     }})
     .style({"opacity": 1,
-	    "stroke": "#F25359",
 	    "stroke-width": function(d) {
 	      if (highlight_ids.indexOf(d.target.name) != -1) {
 		var abunds = get_abunds(abund_var, d.target.name); 
 		return .78 * scales.size(d3.mean(abunds));
 	      }
-	      return 0;}})
+	      return 0;
+	    },
+	    "stroke": function(d) {
+	      if (d.target.doi == 0) {
+		return "#A878C4"
+	      } else if (highlight_ids.indexOf(d.target.name) != -1) {
+		return "#F25359"
+	      } else {
+		return "black";
+	      }}
+	   });
 
   link_selection
     .transition()
@@ -104,11 +132,12 @@ function doi_update() {
       return diagonal({"source": source, "target": target})
     }})
     .style({"opacity": 1,
-	    "stroke": function(d) { return scales.col(d.target.doi) },
 	    "stroke-width": function(d) {
 	      var abunds = get_abunds(abund_var, d.target.name); 
 	      return .66 * scales.size(d3.mean(abunds));
-	    }});
+	    },
+	    "stroke": function(d) { return scales.col(d.target.doi) }
+	   });
 
   node_selection
     .transition()
@@ -120,6 +149,13 @@ function doi_update() {
 	     return scales.size(d3.mean(abunds));
 	   }})
     .style({"opacity": 1,
+	    "stroke-width": function(d) {
+	      if(d.doi == 0 || highlight_ids.indexOf(d.name) != -1) {
+		var abunds = get_abunds(abund_var, d.name); 
+		return .2 * scales.size(d3.mean(abunds));
+	      } else {
+		return 0;
+	      }},
 	    "stroke": function(d) {
 	      if (d.doi == 0) {
 		return "#A878C4"
@@ -127,13 +163,6 @@ function doi_update() {
 		return "#F25359"
 	      } else {
 		return "black";
-	      }},
-	    "stroke-width": function(d) {
-	      if(d.doi == 0 || highlight_ids.indexOf(d.name) != -1) {
-		var abunds = get_abunds(abund_var, d.name); 
-		return .2 * scales.size(d3.mean(abunds));
-	      } else {
-		return 0;
 	      }},
 	    "fill": function(d) {
 	      var abunds = get_abunds(abund_var, d.name);

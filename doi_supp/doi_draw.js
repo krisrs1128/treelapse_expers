@@ -5,8 +5,8 @@
 
 var height = 300,
     width = 500
-var node_size = [10, 50]
-var min_doi = -3.5
+var node_size = [$("#node_x").attr("value"), $("#node_y").attr("value")];
+var min_doi = $("#min_doi").attr("value");
 var tree_var = jQuery.extend(true, {}, tax_tree);
 var abund_var = tax_abund["19009"]
 
