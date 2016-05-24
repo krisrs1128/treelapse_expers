@@ -74,7 +74,11 @@ function doi_update() {
       var target = {"x": d.target.x, "y": d.target.y}
       return diagonal({"source": source, "target": target})
     }})
-    .style({"opacity": 1})
+    .style({"opacity": 1,
+	    "stroke-width": function(d) {
+	      var abunds = get_abunds(abund_var, d.target.name); 
+	      return .66 * scales.size(d3.mean(abunds));
+	    }})
 
   node_selection
     .transition()
