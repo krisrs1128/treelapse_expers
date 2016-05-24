@@ -48,7 +48,6 @@ d3.select("#min_doi")
 d3.select("#min_avg_abund")
   .on("input", function() {
     min_avg_abund = this.value;
-    console.log(min_avg_abund);
     doi_update();
   });
 
