@@ -173,10 +173,13 @@ function doi_update() {
 
 }
 
-function get_matchs(names, search_str) {
+function get_matches(names, search_str) {
   var matches = [];
+  search_str = search_str.toLowerCase();
+  var lower_names = names.map(function(d) { return d.toLowerCase(); });
+
   for (var i = 0; i < names.length; i++) {
-    if (names[i].search(search_str) != -1) {
+    if (lower_names[i].search(search_str) != -1) {
       matches.push(names[i]);
     }
   }
@@ -189,7 +192,7 @@ function get_ancestor_matches(search_str) {
   var nodes = d3.layout.cluster()
       .nodes(tree_var);
   var names = nodes.map(function(d) { return d.name; });
-  var matches = get_matchs(names, search_str);
+  var matches = get_matches(names, search_str);
   
   var ancestor_matches = [];
   for (var i = 0; i < matches.length; i++) {
