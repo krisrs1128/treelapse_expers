@@ -4,9 +4,10 @@
 //////////////////////////////////////////////////////////////////////
 
 var height = 300,
-    width = 500
+    width = 1000;
 var node_size = [$("#node_x").attr("value"), $("#node_y").attr("value")];
 var min_doi = $("#min_doi").attr("value");
+var min_avg_abund = $("#min_avg_abund").attr("value");
 var tree_var = jQuery.extend(true, {}, tax_tree);
 var abund_var = tax_abund["19009"]
 
@@ -40,7 +41,14 @@ var display_dim = [width, height];
 
 d3.select("#min_doi")
   .on("input", function() {
-    min_doi = this.value
+    min_doi = this.value;
+    doi_update();
+  });
+
+d3.select("#min_avg_abund")
+  .on("input", function() {
+    min_avg_abund = this.value;
+    console.log(min_avg_abund);
     doi_update();
   });
 
@@ -67,6 +75,6 @@ $(document).ready(function() {
       highlight_ids = get_ancestor_matches($target.val());
       tree_var = jQuery.extend(true, {}, tax_tree);
       doi_update();
-    }, 100);
+    }, 500);
   })
 });

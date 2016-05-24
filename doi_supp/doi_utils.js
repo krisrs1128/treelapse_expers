@@ -499,3 +499,31 @@ function link_id_fun(d) {
   return d.source.name + "-" + d.target.name;
 }
 
+function filter_tree(tree_var, min_avg_abund) {
+  var keys = Object.keys(tree_var)
+  if (keys.indexOf("children") != -1) {
+
+    var children_copy = tree_var.children.slice();
+    tree_var.children = []
+    
+    for (var i = 0; i < children_copy.length; i++) {
+      var cur_values = get_abunds(abund_var, children_copy[i].name);
+      if (d3.mean(cur_values) >= min_avg_abund) {
+	tree_var.children.push(filter_tree(children_copy[i], min_avg_abund));
+      }
+    }
+    
+    // exact same logic as filter_doi(), maybe modularize this code...
+    var tree_var_res = {}
+    for (var k = 0; k < keys.length; k++) {
+      if (keys[k] != "children") {
+	tree_var_res[keys[k]] = tree_var[keys[k]];
+      } else {
+	if (tree_var.children.length > 0) {
+	  tree_var_res[keys[k]] = tree_var[keys[k]];
+	}      
+      }
+    }
+  }
+  return tree_var;
+}
