@@ -90,10 +90,11 @@ function doi_update() {
 	     return scales.size(d3.mean(abunds));
 	   }})
     .style({"opacity": 1,
-	    "stroke": "red",
+	    "stroke": "#C797F1",
 	    "stroke-width": function(d) {
 	      if(d.doi == 0) {
-		return .5;
+		var abunds = get_abunds(abund_var, d.name); 
+		return .2 * scales.size(d3.mean(abunds));
 	      } else {
 		return 0;
 	      }},
