@@ -2,7 +2,7 @@
 function doi_update() {
   var layout = tree_block(tree_var, focus_node_id, min_doi,
 			  display_dim, node_size);
-
+  
   var tmp = [];
   for (var otu_id in abund_var) {
     for (var time_id in abund_var[otu_id]) {
@@ -90,9 +90,16 @@ function doi_update() {
 	     return scales.size(d3.mean(abunds));
 	   }})
     .style({"opacity": 1,
-	    "stroke": "#C797F1",
+	    "stroke": function(d) {
+	      if (d.doi == 0) {
+		return "#A878C4"
+	      } else if (highlight_ids.indexOf(d.name) != -1) {
+		return "#F25359"
+	      } else {
+		return "black";
+	      }},
 	    "stroke-width": function(d) {
-	      if(d.doi == 0) {
+	      if(d.doi == 0 || highlight_ids.indexOf(d.name) != -1) {
 		var abunds = get_abunds(abund_var, d.name); 
 		return .2 * scales.size(d3.mean(abunds));
 	      } else {
@@ -135,7 +142,7 @@ function doi_update() {
 
 }
 
-function get_search_matchs(names, search_str) {
+function get_matchs(names, search_str) {
   var matches = [];
   for (var i = 0; i < names.length; i++) {
     if (names[i].search(search_str) != -1) {
@@ -145,31 +152,20 @@ function get_search_matchs(names, search_str) {
   return matches;
 }
 
-function highlight_search_results(search_str) {
+function get_ancestor_matches(search_str) {
+  if (search_str == "") return [];
+
   var nodes = d3.layout.cluster()
       .nodes(tree_var);
   var names = nodes.map(function(d) { return d.name; });
-  var matches = get_search_matchs(names, search_str);
-  console.log(matches)
-
+  var matches = get_matchs(names, search_str);
+  
   var ancestor_matches = [];
   for (var i = 0; i < matches.length; i++) {
-    console.log(matches[i]);
-    ancestor_matches = ancestor_matches.concat(get_ancestors(tree_var,
-							     matches[i], []));
+    ancestor_matches = ancestor_matches.concat(
+      get_ancestors(tree_var, matches[i], [])
+    );
     ancestor_matches = _.uniq(ancestor_matches);
   }
-  // doesn't highlight yet
+  return ancestor_matches;
 }
-
-$(document).ready(function() {
-  var timeoutID = null;
-  $('#search_box').keyup(function() {
-    clearTimeout(timeoutID);
-    var $target = $(this);
-    timeoutID = setTimeout(function() {
-      highlight_search_results($target.val());
-    }, 250); 
-  });
-
-});

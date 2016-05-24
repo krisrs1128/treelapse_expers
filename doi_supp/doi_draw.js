@@ -7,7 +7,7 @@ var height = 300,
     width = 500
 var node_size = [10, 50]
 var min_doi = -3.5
-var tree_var = tax_tree
+var tree_var = jQuery.extend(true, {}, tax_tree);
 var abund_var = tax_abund["19009"]
 
 // just draw it for fun
@@ -31,7 +31,8 @@ d3.select("svg")
   .append("g")
   .attr({"id": "nodes"});
 
-var focus_node_id = "Bacteria"
+var focus_node_id = "Bacteria";
+var highlight_ids = [];
 var display_dim = [width, height];
 
 d3.select("#min_doi")
@@ -54,15 +55,15 @@ d3.select("#node_y")
 
 doi_update();
 
-
 $(document).ready(function() {
   var timeoutID = null;
   $('#search_box').keyup(function() {
     clearTimeout(timeoutID);
     var $target = $(this);
     timeoutID = setTimeout(function() {
-      highlight_search_results($target.val());
-    }, 250); 
-  });
-
+      highlight_ids = get_ancestor_matches($target.val());
+      tree_var = jQuery.extend(true, {}, tax_tree);
+      doi_update();
+    }, 500);
+  })
 });
