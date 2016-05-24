@@ -9,14 +9,10 @@ function doi_update() {
       tmp.push(abund_var[otu_id][time_id].value);
     }
   }
-  console.log(tmp);
   var max_abund = d3.max(tmp);
-  console.log(max_abund);
   var scales = {"size": d3.scale.linear()
 		.domain([0, max_abund])
 		.range([.7, 13])};
-  console.log(scales.size(4));
-
 
   var links = d3.layout.cluster()
     .links(layout.nodes)
@@ -55,6 +51,7 @@ function doi_update() {
   node_selection.enter()
     .append("circle")
     .classed("tree_node", true)
+    .attr({"id": function(d) { return "node-" + d.name; }})
     .style({"opacity": 0,
 	    "fill": function(d) {
 	      return col_scale(d.doi) }})
@@ -108,8 +105,16 @@ function doi_update() {
     .transition()
     .duration(1000)
     .text(function(d) { return d.name })
-    .attr({"x": function(d) { return 2.5 + d.x; },
-	   "y": function(d) { return d.y - 3.5; },
+    .attr({"x": function(d) {
+      var abunds = get_abunds(abund_var, d.name); 
+      var r = scales.size(d3.mean(abunds));
+      return d.x + 1.75 * Math.sqrt(r);
+    },
+	   "y": function(d) {
+	     var abunds = get_abunds(abund_var, d.name); 
+	     var r = scales.size(d3.mean(abunds));
+	     return d.y - 1.75 * Math.sqrt(r);
+	   },
 	   "font-size": function(d) {
 	     if(d.doi == 0) {
 	       return 7
