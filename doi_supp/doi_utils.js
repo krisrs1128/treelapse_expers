@@ -494,3 +494,8 @@ function get_ancestors(tree_var, node_id, ancestors) {
   }
   return ancestors;
 }
+
+function link_id_fun(d) {
+  return d.source.name + "-" + d.target.name;
+}
+

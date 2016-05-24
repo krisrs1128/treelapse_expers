@@ -23,6 +23,9 @@ d3.select("svg")
 
 d3.select("svg")
   .append("g")
+  .attr({"id": "highlight-links"});
+d3.select("svg")
+  .append("g")
   .attr({"id": "links"});
 d3.select("svg")
   .append("g")
@@ -64,6 +67,6 @@ $(document).ready(function() {
       highlight_ids = get_ancestor_matches($target.val());
       tree_var = jQuery.extend(true, {}, tax_tree);
       doi_update();
-    }, 500);
+    }, 100);
   })
 });
