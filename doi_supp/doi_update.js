@@ -134,3 +134,42 @@ function doi_update() {
 	     }}});
 
 }
+
+function get_search_matchs(names, search_str) {
+  var matches = [];
+  for (var i = 0; i < names.length; i++) {
+    if (names[i].search(search_str) != -1) {
+      matches.push(names[i]);
+    }
+  }
+  return matches;
+}
+
+function highlight_search_results(search_str) {
+  var nodes = d3.layout.cluster()
+      .nodes(tree_var);
+  var names = nodes.map(function(d) { return d.name; });
+  var matches = get_search_matchs(names, search_str);
+  console.log(matches)
+
+  var ancestor_matches = [];
+  for (var i = 0; i < matches.length; i++) {
+    console.log(matches[i]);
+    ancestor_matches = ancestor_matches.concat(get_ancestors(tree_var,
+							     matches[i], []));
+    ancestor_matches = _.uniq(ancestor_matches);
+  }
+  // doesn't highlight yet
+}
+
+$(document).ready(function() {
+  var timeoutID = null;
+  $('#search_box').keyup(function() {
+    clearTimeout(timeoutID);
+    var $target = $(this);
+    timeoutID = setTimeout(function() {
+      highlight_search_results($target.val());
+    }, 250); 
+  });
+
+});

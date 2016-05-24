@@ -53,3 +53,16 @@ d3.select("#node_y")
   });
 
 doi_update();
+
+
+$(document).ready(function() {
+  var timeoutID = null;
+  $('#search_box').keyup(function() {
+    clearTimeout(timeoutID);
+    var $target = $(this);
+    timeoutID = setTimeout(function() {
+      highlight_search_results($target.val());
+    }, 250); 
+  });
+
+});

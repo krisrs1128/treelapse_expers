@@ -476,3 +476,21 @@ function get_abunds(abund_var, otu_id) {
   }
   return values;
 }
+
+function get_ancestors(tree_var, node_id, ancestors) {
+  if(contains_node(tree_var, node_id)) {
+    ancestors.push(tree_var.name);
+  } else {
+    return;
+  }
+
+  if (typeof tree_var.children != "undefined") {
+    for (var i = 0; i < tree_var.children.length; i++) {
+      var next_ancestors = get_ancestors(tree_var.children[i], node_id, ancestors);
+      if (typeof next_ancestors != "undefined") {
+	ancestors.concat(next_ancestors);
+      }
+    }
+  }
+  return ancestors;
+}
