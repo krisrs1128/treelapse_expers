@@ -8,6 +8,7 @@ var height = 300,
 var node_size = [10, 50]
 var min_doi = -3.5
 var tree_var = tax_tree
+var abund_var = tax_abund["19009"]
 
 // just draw it for fun
 var svg_elem = d3.select("body")
@@ -50,6 +51,5 @@ d3.select("#node_y")
     node_size[1] = this.value
     doi_update();
   });
-
 
 doi_update();

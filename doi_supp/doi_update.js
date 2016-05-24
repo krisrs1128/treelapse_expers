@@ -2,7 +2,22 @@
 function doi_update() {
   var layout = tree_block(tree_var, focus_node_id, min_doi,
 			  display_dim, node_size);
-  
+
+  var tmp = [];
+  for (var otu_id in abund_var) {
+    for (var time_id in abund_var[otu_id]) {
+      tmp.push(abund_var[otu_id][time_id].value);
+    }
+  }
+  console.log(tmp);
+  var max_abund = d3.max(tmp);
+  console.log(max_abund);
+  var scales = {"size": d3.scale.linear()
+		.domain([0, max_abund])
+		.range([.3, 6])};
+  console.log(scales.size(4));
+
+
   var links = d3.layout.cluster()
     .links(layout.nodes)
   var diagonal = d3.svg.diagonal()
@@ -69,7 +84,13 @@ function doi_update() {
     .duration(1000)
     .attr({"cx": function(d) { return d.x },
 	   "cy": function(d) { return d.y},
-	   "r": 2})
+	   "r": function(d) {
+	     var values = []
+	     for (var time_id in abund_var[d.name]) {
+	       values.push(abund_var[d.name][time_id].value);
+	     }
+	     return scales.size(d3.mean(values))
+	   }})
     .style({"opacity": 1,
 	    "stroke": "red",
 	    "stroke-width": function(d) {
