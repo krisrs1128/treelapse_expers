@@ -39,7 +39,8 @@ load(tmp)
 
 ## ---- k-over-a-filter ----
 PS <- PS %>%
-  subset_samples(SubjectID %in% c("19009", "19010"))# %>%
+  subset_samples(SubjectID %in% c("19009", "19010") &
+                 BodySite == "Vaginal_Swab")# %>%
 #  filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
 
 ## --- sample data ----
@@ -56,14 +57,8 @@ sample_info <- sample_info %>%
   mutate(order = 1:n())
 
 sample_info <- sample_info %>%
-  select(sample_id, DateColl, SubjectID)
-colnames(sample_info) <- c("sample_id", "date", "subject")
-
-sample_info$date <- strptime(sample_info$date, "%m/%d/%y %H:%M")
-sample_info$date <- paste(month(sample_info$date), mday(sample_info$date), year(sample_info$date), sep = "-")
-sample_info$date <- as.factor(sample_info$date)
-sample_info$subject <- droplevels(sample_info$subject)
-sample_info$date <- droplevels(sample_info$date)
+  select(sample_id, D2Del, SubjectID)
+colnames(sample_info) <- c("sample_id", "rel_day", "subject")
 
 ## ---- otu-counts ----
 counts <- otu_table(PS) %>%
