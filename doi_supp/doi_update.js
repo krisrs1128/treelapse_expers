@@ -85,11 +85,11 @@ function doi_update() {
     .transition()
     .duration(1000)
     .text(function(d) { return d.name })
-    .attr({"x": function(d) { return 5 + d.x; },
-	   "y": function(d) { return d.y; },
+    .attr({"x": function(d) { return 2.5 + d.x; },
+	   "y": function(d) { return d.y - 3.5; },
 	   "font-size": function(d) {
 	     if(d.doi == 0) {
-	       return 8
+	       return 7
 	     } else {
 	       return 5
 	     }}})
