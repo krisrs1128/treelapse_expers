@@ -39,8 +39,8 @@ load(tmp)
 
 ## ---- k-over-a-filter ----
 PS <- PS %>%
-  subset_samples(SubjectID %in% c("19009", "19010")) %>%
-  filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
+  subset_samples(SubjectID %in% c("19009", "19010"))# %>%
+#  filter_taxa(function(x) sum(x > 1) > 0.1 * length(x), TRUE)
 
 ## --- sample data ----
 sample_info <- sample_data(PS)
