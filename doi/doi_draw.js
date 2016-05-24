@@ -20,7 +20,7 @@ d3.select("svg")
 	 "height": height,
 	 "fill": "#F5F5F5"})
 
-var focus_node_id = "K:Bacteria"
+var focus_node_id = "Bacteria"
 var display_dim = [width, height];
 
 d3.select("#min_doi")
