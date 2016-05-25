@@ -20,9 +20,14 @@ d3.select("svg")
 
 d3.select("svg")
   .selectAll("g")
-  .data(["all_ts", "all_brushes", "nodes", "links"]).enter()
+  .data(["all_ts", "all_brushes", "nodes", "links", "mouseover"]).enter() 
   .append("g")
   .attr({"id": function(d) { return d; }});
+
+d3.select("#mouseover")
+  .append("text")
+  .classed("mouseover_text", true)
+  .attr({"transform": "translate(" + .05 * width + ", 20)"});
 
 // get array extents, for scales
 var abund_array = [];

@@ -37,6 +37,16 @@ function tb_update() {
 	     return scales.r(d3.mean(abund_var[d.name]
 				     .map(function(x) { return x.value;  })))
 	   }})
+    .style({"opacity": .7})
+    .on("mouseover", function(d) {
+      var r = parseFloat(d3.select(this).attr("r"))
+      d3.select("#mouseover")
+	.attr({"transform": "translate(" + (d.x + 2 * Math.sqrt(r))+
+	       "," + (d.y - 2 * Math.sqrt(r)) + ")"})
+      d3.select("text")
+	.text(d.name)
+	.attr({"font-size": 8});
+    });
 
   ts_selection.transition()
     .duration(700)
@@ -74,11 +84,11 @@ function tb_update() {
 	  return "#696969";
 	}
       },
-      "alpha": function(d) {
-	if(cur_lines.indexOf(d) != -1) {
-	  return .8
+      "opacity": function(d) {
+	if(cur_lines.indexOf(d.name) != -1) {
+	  return 1
 	} else {
-	  return .05
+	  return .7
 	}
       }});
 }
