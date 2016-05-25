@@ -47,10 +47,12 @@ time_array = _.uniq(time_array)
 
 // structures for the tree
 var nodes = d3.layout.cluster()
-    .size([.9 * width, .9 * (height / 2) - 20])
+    .size([.9 * width, .9 * ((height / 2) - 20)])
     .nodes(tree_var)
 
 d3.select("#nodes")
+  .attr({"transform": "translate(" + .05 * width + ", 20)"});
+d3.select("#links")
   .attr({"transform": "translate(" + .05 * width + ", 20)"});
 
 var links = d3.layout.cluster()
