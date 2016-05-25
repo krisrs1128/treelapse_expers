@@ -24,7 +24,7 @@ function tb_update() {
 	    "stroke-width": 0});
 
   ts_selection.transition()
-    .duration(200)
+    .duration(700)
     .style({
       "stroke": function(d) {
 	if (cur_lines.indexOf(d) != -1) {
@@ -35,7 +35,7 @@ function tb_update() {
       },
       "stroke-width": function(d) {
 	if (cur_lines.indexOf(d) != -1) {
-	  return .7;
+	  return .5;
 	} else {
 	  return .1;
 	}

@@ -14,7 +14,7 @@ d3.select("svg")
   .append("rect")
   .attr({"width": width,
 	 "height": height,
-	 "fill": "#F5F5F5"});
+	 "fill": "#FAFAFA"});
 
 d3.select("svg")
   .append("g")
@@ -47,23 +47,48 @@ var scales = {"x": d3.scale.linear()
 	      .range([height - 15, 30])};
 
 var all_brushes = [];
+var brush_nums = [];
+function get_nums(d) {
+  return parseFloat(d.match(/\d+/)[0])
+}
 
 function new_brush() {
   var cur_brush = d3.svg.brush()
       .x(scales.x)
       .y(scales.y)
       .on("brush", brush_fun);
-  all_brushes.push({"id": all_brushes.length,
-		    "brush": cur_brush});
+
+  var cur_id = d3.max(brush_nums) + 1;
+  if (isNaN(cur_id)) cur_id = 0;
+  all_brushes.push({"id": "brush-" + cur_id, "brush": cur_brush});
+  brush_nums = all_brushes.map(function(d) { return get_nums(d.id) });
+
   brush_ix = all_brushes.length - 1;
-  focus_brush(brush_ix);
+  focus_brush(brush_nums[brush_ix]);
   update();
+}
+
+function remove_brush() {
+  new_all_brushes = all_brushes.splice();
+  for (var i = 0; i < all_brushes.length; i++) {
+    if (all_brushes[i].id != "brush-" + brush_nums[brush_ix]) {
+      console.log(all_brushes[i].id)
+      new_all_brushes.push(all_brushes[i]);
+    }
+  }
+  all_brushes = new_all_brushes;
+  brush_nums = all_brushes.map(function(d) { return get_nums(d.id) });
+  console.log(all_brushes);
+  brush_ix = (brush_ix + 1) % all_brushes.length
+  focus_brush(brush_nums[brush_ix]);
+  update();
+  brush_fun();
 }
 
 function update() {
   var brush_selection = d3.select("#all_brushes")
       .selectAll(".brush")
-      .data(all_brushes)
+      .data(all_brushes, function(d) { return d.id; })
 
   brush_selection.enter()
     .append("g")
@@ -71,8 +96,9 @@ function update() {
     .attr("id", function(d, i) { return "brush-" + i; })
     .each(function(d) {
       d3.select(this).call(d.brush);
-    })
+    });
 
+  brush_selection.exit().remove();
 
   brush_selection
     .transition()
@@ -80,34 +106,39 @@ function update() {
     .style({
       "fill": "#583045",
       "opacity": function(d, i){
-	if (d.id == brush_ix) {
-	  return .6;
-	} else {
+	if (d.id == "brush-" + brush_nums[brush_ix]) {
 	  return .4;
+	} else {
+	  return .2;
 	}
       }});
 }
   
 function brush_fun() {
-  cur_lines = Object.keys(abund_var);
-  for (var i = 0; i < all_brushes.length; i++) {
-    var box_extent = all_brushes[i].brush.extent()
-    box_extent = {"time_min": box_extent[0][0],
-		  "value_min": box_extent[0][1],
-		  "time_max": box_extent[1][0],
-		  "value_max": box_extent[1][1]};
-    cur_lines = _.intersection(cur_lines, 
-			    lines_in_box(abund_var,
-					 box_extent)
-			   );
+  if (all_brushes.length > 0) {
+    cur_lines = Object.keys(abund_var);
+    for (var i = 0; i < all_brushes.length; i++) {
+      var box_extent = all_brushes[i].brush.extent()
+      box_extent = {"time_min": box_extent[0][0],
+		    "value_min": box_extent[0][1],
+		    "time_max": box_extent[1][0],
+		    "value_max": box_extent[1][1]};
+      cur_lines = _.intersection(cur_lines, 
+				 lines_in_box(abund_var,
+					      box_extent)
+				);
+    }
+  } else {
+    cur_lines = []
   }
+  console.log(cur_lines);
   tb_update();
 }
 
 function focus_brush(brush_ix) {
   d3.selectAll(".brush")
-    .style({"pointer-events": function(d, i) {
-      if (i == brush_ix) {
+    .style({"pointer-events": function(d) {
+      if (d.id == "brush-" + brush_ix) {
 	return "all";
       } else {
 	return "none";
@@ -117,7 +148,7 @@ function focus_brush(brush_ix) {
 
 function change_focus() {
   brush_ix = (brush_ix + 1) % all_brushes.length;
-  focus_brush(brush_ix);
+  focus_brush(brush_nums[brush_ix]);
   update();
 }
 
