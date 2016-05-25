@@ -58,6 +58,7 @@ function tb_update() {
 	     return scales.r(d3.mean(abund_var[d.name]
 				     .map(function(x) { return x.value;  })))
 	   }})
+    .style({"fill": "#696969"})
     .on("mouseover",
 	function(d) {
 	  var r = parseFloat(d3.select(this).attr("r"))
@@ -104,6 +105,6 @@ function tb_update() {
 	} else {
 	  return "#696969";
 	}
-      }
+      },
     });
 }
