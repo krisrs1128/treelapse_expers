@@ -23,17 +23,10 @@ d3.select("svg")
 	 "fill": "#F5F5F5"})
 
 d3.select("svg")
+  .selectAll("g")
+  .data(["highlight-links", "links", "nodes", "text"]).enter()
   .append("g")
-  .attr({"id": "highlight-links"});
-d3.select("svg")
-  .append("g")
-  .attr({"id": "links"});
-d3.select("svg")
-  .append("g")
-  .attr({"id": "text"});
-d3.select("svg")
-  .append("g")
-  .attr({"id": "nodes"});
+  .attr({"id": function(d) { return d; }});
 
 var focus_node_id = "Bacteria";
 var highlight_ids = [];
