@@ -105,12 +105,12 @@ function doi_update() {
       var target = {"x": d.target.x, "y": d.target.y}
       return diagonal({"source": source, "target": target})
     }})
-    .style({"opacity": 1,
+    .style({"opacity": .5,
 	    "stroke-width": function(d) {
 	      if ((highlight_ids.indexOf(d.target.name) != -1) ||
 		  (d.target.doi == 0)) {
 		var abunds = get_abunds(abund_var, d.target.name); 
-		return .9 * scales.size(d3.mean(abunds));
+		return 1.5 * scales.size(d3.mean(abunds));
 	      }
 	      return 0;
 	    },

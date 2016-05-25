@@ -1,8 +1,8 @@
 
-var abund_var = tax_abund["19009"];
+var abund_var = tax_abund["10101"];
 var cur_lines = [];
 var height = 300,
-    width = 500
+    width = 800
 var brush_ix = 0;
 
 // just draw it for fun
@@ -38,13 +38,15 @@ abund_array = _.uniq(abund_array)
   .map(parseFloat);
 time_array = _.uniq(time_array)
   .map(parseFloat);
+console.log(time_array)
+console.log(abund_array)
 
 var scales = {"x": d3.scale.linear()
 	      .domain(d3.extent(time_array))
 	      .range([10, width - 10]),
 	      "y": d3.scale.linear()
 	      .domain(d3.extent(abund_array))
-	      .range([height - 15, 30])};
+	      .range([height - 15, 15])};
 
 var all_brushes = [];
 var brush_nums = [];
@@ -78,7 +80,6 @@ function remove_brush() {
   }
   all_brushes = new_all_brushes;
   brush_nums = all_brushes.map(function(d) { return get_nums(d.id) });
-  console.log(all_brushes);
   brush_ix = (brush_ix + 1) % all_brushes.length
   focus_brush(brush_nums[brush_ix]);
   update();
@@ -131,7 +132,6 @@ function brush_fun() {
   } else {
     cur_lines = []
   }
-  console.log(cur_lines);
   tb_update();
 }
 

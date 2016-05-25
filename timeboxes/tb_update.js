@@ -1,6 +1,6 @@
 
 function tb_update() {
-  var abund_var = jQuery.extend(true, {}, tax_abund["19009"]);
+  var abund_var = jQuery.extend(true, {}, tax_abund["10101"]);
   var line_fun = d3.svg.line()
       .x(function(d) {
 	return scales.x(d.time); })
@@ -35,7 +35,7 @@ function tb_update() {
       },
       "stroke-width": function(d) {
 	if (cur_lines.indexOf(d) != -1) {
-	  return .5;
+	  return 1;
 	} else {
 	  return .1;
 	}

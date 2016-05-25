@@ -9,7 +9,7 @@ var node_size = [$("#node_x").attr("value"), $("#node_y").attr("value")];
 var min_doi = $("#min_doi").attr("value");
 var min_avg_abund = $("#min_avg_abund").attr("value");
 var tree_var = jQuery.extend(true, {}, tax_tree);
-var abund_var = tax_abund["19009"]
+var abund_var = tax_abund["10101"]
 
 // just draw it for fun
 var svg_elem = d3.select("body")
@@ -74,6 +74,6 @@ $(document).ready(function() {
       highlight_ids = get_ancestor_matches($target.val());
       tree_var = jQuery.extend(true, {}, tax_tree);
       doi_update();
-    }, 500);
+    }, 10);
   })
 });
