@@ -26,16 +26,23 @@ function tb_update() {
   ts_selection.transition()
     .duration(200)
     .style({
+      "stroke": function(d) {
+	if (cur_lines.indexOf(d) != -1) {
+	  return "#2D869F";
+	} else {
+	  return "#696969";
+	}
+      },
       "stroke-width": function(d) {
 	if (cur_lines.indexOf(d) != -1) {
-	  return 1;
+	  return .7;
 	} else {
 	  return .1;
 	}
       },
       "alpha": function(d) {
 	if(cur_lines.indexOf(d) != -1) {
-	  return 1
+	  return .8
 	} else {
 	  return .05
 	}
