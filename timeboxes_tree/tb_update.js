@@ -41,14 +41,15 @@ function tb_update() {
 	var source = {"x": d.source.x, "y": d.source.y}
 	var target = {"x": d.target.x, "y": d.target.y}
 	return diagonal({"source": source, "target": target})
-      },
-      "stroke-width": function(d) {
-	scales.r(d3.mean(abund_var[d.target.name]
-			 .map(function(x) { return x.value;  })))
-      }})
+      }
+    })
     .style({"opacity": .4,
-	    "stroke": "#696969"})
-
+	    "stroke": "#696969",
+	    "stroke-width": function(d) {
+	      return scales.r(d3.mean(abund_var[d.target.name]
+				      .map(function(x) { return x.value;  })))
+	    }});
+  
   node_selection.enter()
     .append("circle")
     .classed("tree_node", true)
