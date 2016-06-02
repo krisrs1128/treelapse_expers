@@ -133,7 +133,7 @@ tree_counts_multi <- function(el, mapping, counts, sample_info) {
     for (j in seq_along(unique_dates)) {
       cur_ix <- which(sample_info$subject %in% unique_subjects[i] &
                         sample_info$rel_day %in% unique_dates[j])
-      cur_counts <- tree_counts(el, mapping, unlist(colSums(counts[cur_ix, ])))
+      cur_counts <- tree_counts(el, mapping, unlist(colSums(counts[cur_ix, , drop = F])))
       cur_counts <- setNames(cur_counts$count, cur_counts$label)
 
       reorder_ix <- match(rownames(counts_list[[i]]), names(cur_counts))
@@ -141,6 +141,7 @@ tree_counts_multi <- function(el, mapping, counts, sample_info) {
         round(digits = 2)
     }
   }
+
   counts_list <- counts_list %>%
     unfold_counts_list()
   names(counts_list) <- unique_subjects
