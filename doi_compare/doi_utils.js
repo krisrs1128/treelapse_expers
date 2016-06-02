@@ -526,20 +526,30 @@ function filter_tree(tree_var, min_avg_abund) {
   return tree_var;
 }
 
-function offset_node(x, y, widths) {
-  var half_width = d3.sum(widths) / 2.0;
-  var new_pos = [{"x": x - half_width, "y": y}];
+function offset_node(x, y, widths_obj) {
+  var keys = Object.keys(widths_obj);
+  var widths = [];
+  for (var k = 0; k < keys.length; k++) {
+    widths.push(widths_obj[keys[k]]);
+  }
 
-  for (var i = 1; i < widths.length; i++) {
-    new_pos.push({"x": new_pos[i - 1].x + widths[i - 1], "y": y});
+  var half_width = d3.sum(widths) / 2.0;
+  var new_pos = {};
+  new_pos[keys[0]] = {"x": x - half_width, "y": y};
+
+  for (var i = 1; i < keys.length; i++) {
+    new_pos[keys[i]] = {"x": new_pos[keys[i - 1]].x + widths[i - 1], "y": y};
   }
   return new_pos;
 }
 
 function offset_nodes_multi(nodes, widths) {
-  nodes_pos = [];
-  for (var i = 0; i < nodes.length; i++) {
-    nodes_pos.push(offset_node(nodes[i].x, nodes[i].y, widths[i]));
+  nodes_pos = {};
+  var keys = Object.keys(widths);
+  var node_names = nodes.map(function(d) { return d.name });
+  for (var i = 0; i < node_names.length; i++) {
+    var cur_ix = keys.indexOf(node_names[i]);
+    nodes_pos[node_names[i]] = offset_node(nodes[i].x, nodes[i].y, widths[keys[cur_ix]]);
   }
   return nodes_pos;
 }
@@ -578,39 +588,23 @@ function get_avg_abunds(reshaped_abund) {
 }
 
 function offset_widths(avg_abunds, size_scale) {
-  var widths = [];
+  var widths = {};
   var otu_ids = Object.keys(avg_abunds);
   var group_ids = Object.keys(avg_abunds[otu_ids[0]]);
 
   for (var i = 0; i < otu_ids.length; i++) {
-    cur_widths = [];
+    widths[otu_ids[i]] = {};
     for (var j = 0; j < group_ids.length; j++) {
-      cur_widths.push(size_scale(avg_abunds[otu_ids[i]][group_ids[j]]));
+      var cur_abund = avg_abunds[otu_ids[i]][group_ids[j]]
+      widths[otu_ids[i]][group_ids[j]] = size_scale(cur_abund);
     }
-    widths.push(cur_widths);
   }
   return widths;
-}
-
-function reorder_widths(widths, node_order, abund_vars) {
-  var group_ids = Object.keys(abund_vars);
-  var abund_order = Object.keys(abund_vars[group_ids[0]]);
-
-  var widths_reorder = [];
-  for (var i = 0; i < node_order.length; i++) {
-    console.log(node_order[i]);
-    var cur_ix = abund_order.indexOf(node_order[i]);
-    console.log(cur_ix);
-    widths_reorder.push(widths[cur_ix]);
-  }
-  return widths_reorder;
 }
 
 function offset_nodes_abund(nodes, abund_vars, size_scale) {
   var reshaped = reshape_nested_object(abund_vars);
   var avg_abunds = get_avg_abunds(reshaped);
   var widths = offset_widths(avg_abunds, size_scale);
-  var node_order = nodes.map(function(d) { return d.name });
-  widths = reorder_widths(widths, node_order, abund_vars);
   return offset_nodes_multi(nodes, widths);
 }

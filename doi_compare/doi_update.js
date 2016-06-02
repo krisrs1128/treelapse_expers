@@ -5,7 +5,7 @@ function doi_update() {
   var layout = tree_block(filtered_tree, focus_node_id, min_doi,
 			  display_dim, node_size);
   var group_ids = Object.keys(abund_vars);
-  
+
   var tmp = [];
   for (var group_id in abund_vars) {
     for (var otu_id in abund_vars[group_id]) {
@@ -24,7 +24,7 @@ function doi_update() {
 		.range(["#B1A1E6", "#F5916A"])};
 
   var links = d3.layout.cluster()
-    .links(layout.nodes)
+      .links(layout.nodes)
   var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.x, d.y]})
 
@@ -34,37 +34,48 @@ function doi_update() {
 
   var all_node_pos = offset_nodes_abund(layout.nodes, abund_vars,
 					scales.size);
-  
+
+  var otu_ids = Object.keys(all_node_pos);
   for (var j = 0; j < group_ids.length; j++) {
-    for (var i = 0; i < layout.nodes.length; i++) {
-      layout.nodes[i] = jQuery.extend(layout.nodes[i], all_node_pos[i][j]);
+    for (var i = 0; i < links.length; i++) {
+      var source_pos = all_node_pos[links[i].source.name][group_ids[j]]
+      var target_pos = all_node_pos[links[i].target.name][group_ids[j]];
+
+      links[i].source = jQuery.extend(links[i].source, source_pos);
+      links[i].target = jQuery.extend(links[i].target, target_pos);
     }
-    
-    draw_nodes(d3.select("#nodes #group-" + j), layout.nodes,
+    draw_links(d3.select("#links #group-" + j), links,
 	       abund_vars[group_ids[j]], group_ids[j], scales);
   }
 }
 
-function draw_nodes(el, nodes, abunds, group_id, scales) {
-  var node_selection = el.selectAll(".tree_nodes")
-      .data(nodes, function(d) { return group_id + "-" + d.name; });
-  node_selection.exit().remove();
-  node_selection.enter()
-    .append("circle")
-    .classed("tree_nodes", true)
-    .attr({"cx": function(d) { return d.x; },
-	   "cy": function(d) { return d.y; }})
-    .style({"opacity": 0,
-	    "r": function(d) { return scales.size(d3.mean(get_abunds(abunds, d.name)))},
-	    "fill": function(d) { return scales.col(group_id)}});
+function draw_links(el, links, abunds, group_id, scales) {
+  var diagonal = d3.svg.diagonal()
+      .projection(function(d) { return [d.x, d.y]})
 
-  node_selection.transition()
+  var links_selection = el.selectAll(".tree_link")
+      .data(links, function(d) {
+	return group_id + "-" + d.source.name + d.target.name;
+      });
+  links_selection.exit().remove();
+  links_selection.enter()
+    .append("path", "g")
+    .classed("tree_link", true)
+
+  links_selection.transition()
     .duration(700)
-    .attr({"cx": function(d) { return d.x; },
-	   "cy": function(d) { return d.y; },
-	   "r": function(d) { return scales.size(d3.mean(get_abunds(abunds, d.name)))}})
-    .style({"opacity": 0.5,
-	    "fill": function(d) { return scales.col(group_id)}});
+    .attr({"d": function(d) {
+      var source = {"x": d.source.x, "y": d.source.y}
+      var target = {"x": d.target.x, "y": d.target.y}
+      return diagonal({"source": source, "target": target})
+    }})
+    .style({
+      "stroke-width": function(d) {
+	var cur_abunds = get_abunds(abunds, d.target.name)
+	return scales.size(d3.mean(cur_abunds));
+      },
+      "opacity": 1,
+      "stroke": scales.col(group_id)});
 }
 
 function get_matches(names, search_str) {

@@ -32,6 +32,10 @@ for (var i = 0; i < Object.keys(abund_vars).length; i++) {
   d3.select("#nodes")
     .append("g")
     .attr({"id": "group-" + i})
+  d3.select("#links")
+    .append("g")
+    .attr({"id": "group-" + i})
+
 }
 
 var focus_node_id = "Bacteria";
