@@ -538,15 +538,17 @@ function offset_node(x, y, widths_obj) {
 
   var half_width = d3.sum(widths) / 2.0;
   var new_pos = {};
-  new_pos[keys[0]] = {"x": x - half_width, "y": y};
+  new_pos[keys[0]] = {"x": x - half_width + widths[0] / 2.0, "y": y};
 
   for (var i = 1; i < keys.length; i++) {
-    new_pos[keys[i]] = {"x": new_pos[keys[i - 1]].x + widths[i - 1], "y": y};
+    new_pos[keys[i]] = {"x": new_pos[keys[i - 1]].x + (
+      widths[i - 1] / 2.0) + (widths[i] / 2.0), "y": y};
   }
   return new_pos;
 }
 
 function offset_nodes_multi(nodes, widths) {
+  console.log(widths);
   nodes_pos = {};
   var keys = Object.keys(widths);
   var node_names = nodes.map(function(d) { return d.name });

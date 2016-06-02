@@ -18,10 +18,10 @@ function doi_update() {
   var max_abund = d3.max(tmp);
   var scales = {"size": d3.scale.linear()
 		.domain([0, max_abund])
-		.range([1.1, 15]),
+		.range([.6, 12]),
 	        "col": d3.scale.ordinal()
 		.domain(Object.keys(abund_vars))
-		.range(["#B1A1E6", "#F5916A"])};
+		.range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"])};
 
   var links = d3.layout.cluster()
       .links(layout.nodes)
@@ -32,8 +32,7 @@ function doi_update() {
       .selectAll(".tree_link")
       .data(links, link_id_fun);
 
-  var all_node_pos = offset_nodes_abund(layout.nodes, abund_vars,
-					scales.size);
+  var all_node_pos = offset_nodes_abund(layout.nodes, abund_vars, scales.size);
 
   var otu_ids = Object.keys(all_node_pos);
   for (var j = 0; j < group_ids.length; j++) {

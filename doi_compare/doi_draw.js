@@ -8,8 +8,8 @@ var height = 300,
 var node_size = [$("#node_x").attr("value"), $("#node_y").attr("value")];
 var min_doi = $("#min_doi").attr("value");
 var min_avg_abund = $("#min_avg_abund").attr("value");
-var tree_var = jQuery.extend(true, {}, tax_tree);
-var abund_vars = tax_abund
+var tree_var = jQuery.extend(true, {}, cst_tax_tree);
+var abund_vars = cst_tax_abund
 
 // just draw it for fun
 var svg_elem = d3.select("body")
