@@ -78,7 +78,7 @@ function draw_links(el, links, abunds, group_id, scales) {
     })
     .on("click",
 	function(d) {
-	  focus_node_id = d.source.name;
+	  focus_node_id = d.target.name;
 	  doi_update();
 	});
 
