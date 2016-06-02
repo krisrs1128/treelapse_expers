@@ -18,7 +18,7 @@ function doi_update() {
   var max_abund = d3.max(tmp);
   var scales = {"size": d3.scale.linear()
 		.domain([0, max_abund])
-		.range([.7, 13]),
+		.range([1.1, 15]),
 	        "col": d3.scale.ordinal()
 		.domain(Object.keys(abund_vars))
 		.range(["#B1A1E6", "#F5916A"])};
@@ -47,7 +47,7 @@ function doi_update() {
     draw_links(d3.select("#links #group-" + j), links,
 	       abund_vars[group_ids[j]], group_ids[j], scales);
   }
-  draw_text(d3.select("#text"), layout.nodes);
+  draw_text(d3.select("#text"), links, abund_vars[group_ids[1]], scales);
 }
 
 function draw_links(el, links, abunds, group_id, scales) {
@@ -97,10 +97,10 @@ function draw_links(el, links, abunds, group_id, scales) {
       }});
 }
 
-function draw_text(el, nodes) {
+function draw_text(el, links, abunds, scales) {
   var text_selection = el.selectAll(".tree_text")
-      .data(nodes.filter(function(d) { return d.doi >= -1}),
-	    function(d) { return d.name });
+      .data(links.filter(function(d) { return d.source.doi >= -1}),
+	    function(d) { return d.source.name });
 
   text_selection.exit().remove();
 
@@ -112,23 +112,27 @@ function draw_text(el, nodes) {
   text_selection
     .transition()
     .duration(1000)
-    .text(function(d) { return d.name })
+    .text(function(d) { return d.source.name })
     .attr({
       "x": function(d) {
-	return d.x;
+	var cur_abunds = get_abunds(abunds, d.source.name);
+	var r = scales.size(d3.mean(cur_abunds));
+	return d.source.x + 1.4 * Math.sqrt(r);
       },
       "y": function(d) {
-	return d.y;
+	var cur_abunds = get_abunds(abunds, d.source.name);
+	var r = scales.size(d3.mean(cur_abunds));
+	return d.source.y - Math.sqrt(r);
       },
       "font-size": function(d) {
-	if(d.doi == 0) {
+	if(d.source.doi == 0) {
 	  return 12
 	} else {
 	  return 7
 	}}})
     .style({
       "opacity":  function(d) {
-	if(d.doi == 0) {
+	if(d.source.doi == 0) {
 	  return 1
 	} else {
 	  return .6
