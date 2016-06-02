@@ -32,7 +32,14 @@ function doi_update() {
       .selectAll(".tree_link")
       .data(links, link_id_fun);
 
+  var all_node_pos = offset_nodes_abund(layout.nodes, abund_vars,
+					scales.size);
+  
   for (var j = 0; j < group_ids.length; j++) {
+    for (var i = 0; i < layout.nodes.length; i++) {
+      layout.nodes[i] = jQuery.extend(layout.nodes[i], all_node_pos[i][j]);
+    }
+    
     draw_nodes(d3.select("#nodes #group-" + j), layout.nodes,
 	       abund_vars[group_ids[j]], group_ids[j], scales);
   }

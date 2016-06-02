@@ -525,3 +525,92 @@ function filter_tree(tree_var, min_avg_abund) {
   }
   return tree_var;
 }
+
+function offset_node(x, y, widths) {
+  var half_width = d3.sum(widths) / 2.0;
+  var new_pos = [{"x": x - half_width, "y": y}];
+
+  for (var i = 1; i < widths.length; i++) {
+    new_pos.push({"x": new_pos[i - 1].x + widths[i - 1], "y": y});
+  }
+  return new_pos;
+}
+
+function offset_nodes_multi(nodes, widths) {
+  nodes_pos = [];
+  for (var i = 0; i < nodes.length; i++) {
+    nodes_pos.push(offset_node(nodes[i].x, nodes[i].y, widths[i]));
+  }
+  return nodes_pos;
+}
+
+function reshape_nested_object(obj) {
+  var reshaped = {};
+  var group_ids = Object.keys(obj);
+  var otu_ids = Object.keys(obj[group_ids[0]]);
+
+  for (var i = 0; i < otu_ids.length; i++) {
+    reshaped[otu_ids[i]] = {};
+    for (var j = 0; j < group_ids.length; j++) {
+      reshaped[otu_ids[i]][group_ids[j]] = obj[group_ids[j]][otu_ids[i]];
+    }
+  }
+
+  return reshaped;
+}
+
+function get_avg_abunds(reshaped_abund) {
+  var otu_ids = Object.keys(reshaped_abund);
+  var group_ids = Object.keys(reshaped_abund[otu_ids[0]]);
+
+  avg_abunds = {};
+
+  for (var i = 0; i < otu_ids.length; i++) {
+    avg_abunds[otu_ids[i]] = {};
+    for (var j = 0; j < group_ids.length; j++) {
+      var cur_abund = reshaped_abund[otu_ids[i]][group_ids[j]].map(function(d) {
+	return d.value;
+      })
+      avg_abunds[otu_ids[i]][group_ids[j]] = d3.mean(cur_abund);
+    }
+  }
+  return avg_abunds;
+}
+
+function offset_widths(avg_abunds, size_scale) {
+  var widths = [];
+  var otu_ids = Object.keys(avg_abunds);
+  var group_ids = Object.keys(avg_abunds[otu_ids[0]]);
+
+  for (var i = 0; i < otu_ids.length; i++) {
+    cur_widths = [];
+    for (var j = 0; j < group_ids.length; j++) {
+      cur_widths.push(size_scale(avg_abunds[otu_ids[i]][group_ids[j]]));
+    }
+    widths.push(cur_widths);
+  }
+  return widths;
+}
+
+function reorder_widths(widths, node_order, abund_vars) {
+  var group_ids = Object.keys(abund_vars);
+  var abund_order = Object.keys(abund_vars[group_ids[0]]);
+
+  var widths_reorder = [];
+  for (var i = 0; i < node_order.length; i++) {
+    console.log(node_order[i]);
+    var cur_ix = abund_order.indexOf(node_order[i]);
+    console.log(cur_ix);
+    widths_reorder.push(widths[cur_ix]);
+  }
+  return widths_reorder;
+}
+
+function offset_nodes_abund(nodes, abund_vars, size_scale) {
+  var reshaped = reshape_nested_object(abund_vars);
+  var avg_abunds = get_avg_abunds(reshaped);
+  var widths = offset_widths(avg_abunds, size_scale);
+  var node_order = nodes.map(function(d) { return d.name });
+  widths = reorder_widths(widths, node_order, abund_vars);
+  return offset_nodes_multi(nodes, widths);
+}

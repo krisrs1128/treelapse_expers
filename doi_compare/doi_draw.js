@@ -34,7 +34,6 @@ for (var i = 0; i < Object.keys(abund_vars).length; i++) {
     .attr({"id": "group-" + i})
 }
 
-
 var focus_node_id = "Bacteria";
 var highlight_ids = [];
 var display_dim = [width, height];
