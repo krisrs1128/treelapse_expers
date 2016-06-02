@@ -435,9 +435,7 @@ function trim_height(tree_var) {
  *
  * @return The filtered tree and nodes.
  **/
-function tree_block(tree_var0, focus_node_id, min_doi = -10,
-		    display_dim = [500, 500],
-		    node_size = [4, 10]) {
+function tree_block(tree_var0, focus_node_id, min_doi, display_dim, node_size) {
   var tree_var = jQuery.extend(true, {}, tree_var0);
   tree_var = supplement_tree(tree_var, 0);
   tree_var = set_doi(tree_var, focus_node_id, min_doi);
