@@ -61,6 +61,21 @@ function draw_links(el, links, abunds, group_id, scales) {
   links_selection.enter()
     .append("path", "g")
     .classed("tree_link", true)
+    .style({
+      "opacity": 0,
+      "stroke": scales.col(group_id),
+      "stroke-width": function(d) {
+	var cur_abunds = get_abunds(abunds, d.target.name)
+	return scales.size(d3.mean(cur_abunds));
+      }
+    })
+    .on("click",
+	function(d) {
+	  focus_node_id = d.target.name;
+	  doi_update();
+	});
+
+  
 
   links_selection.transition()
     .duration(700)
@@ -70,12 +85,11 @@ function draw_links(el, links, abunds, group_id, scales) {
       return diagonal({"source": source, "target": target})
     }})
     .style({
+      "opacity": 1,
       "stroke-width": function(d) {
 	var cur_abunds = get_abunds(abunds, d.target.name)
 	return scales.size(d3.mean(cur_abunds));
-      },
-      "opacity": 1,
-      "stroke": scales.col(group_id)});
+      }});
 }
 
 function get_matches(names, search_str) {
