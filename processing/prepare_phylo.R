@@ -40,7 +40,7 @@ load(tmp)
 ## ---- k-over-a-filter ----
 PS <- PS %>%
   subset_samples(SubjectID %in% c("10101", "10028") &
-                   BodySite == "Stool") %>%
+                   BodySite == "Vaginal_Swab") %>%
   filter_taxa(function(x) sum(x > 1) > 0.01 * length(x), TRUE)
 
 ## --- sample data ----
