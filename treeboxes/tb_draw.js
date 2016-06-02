@@ -49,13 +49,6 @@ var nodes = d3.layout.cluster()
     .size([.9 * width, .9 * ((height / 2) - 20)])
     .nodes(tree_var)
 
-d3.select("#nodes")
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
-d3.select("#links")
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
-d3.select("#all_brushes")
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
-
 var links = d3.layout.cluster()
     .links(nodes);
 
@@ -73,10 +66,10 @@ var scales = {"x": d3.scale.linear()
 	      .range([1, 10]),
 	      "x_tree": d3.scale.linear()
 	      .domain([0, width])
-	      .range([0, width]),
+	      .range([10, width - 10]),
 	      "y_tree": d3.scale.linear()
 	      .domain([0, height / 2])
-	      .range([0, height / 2])};
+	      .range([20, height / 2 - 20])};
 
 var all_brushes = [];
 var brush_nums = [];

@@ -43,18 +43,14 @@ function tb_update() {
 	  .attr({"font-size": 8});
 	}
     })
-    .on("mouseout", function(d) {
-      d3.select("text")
-	.text();
-    })
 
   link_selection.enter()
     .append("path")
     .classed("tree_link", true)
     .attr({
       "d": function(d) {
-	var source = {"x": d.source.x, "y": d.source.y}
-	var target = {"x": d.target.x, "y": d.target.y}
+	var source = {"x": scales.x_tree(d.source.x), "y": scales.y_tree(d.source.y)}
+	var target = {"x": scales.x_tree(d.target.x), "y": scales.y_tree(d.target.y)}
 	return diagonal({"source": source, "target": target})
       }
     })
@@ -68,8 +64,8 @@ function tb_update() {
   node_selection.enter()
     .append("circle")
     .classed("tree_node", true)
-    .attr({"cx": function(d) { return d.x },
-	   "cy": function(d) { return d.y },
+    .attr({"cx": function(d) { return scales.x_tree(d.x) },
+	   "cy": function(d) { return scales.y_tree(d.y) },
 	   "r": function(d) {
 	     return scales.r(d3.mean(abund_var[d.name]
 				     .map(function(x) { return x.value;  })))
