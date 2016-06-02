@@ -505,7 +505,10 @@ function filter_tree(tree_var, min_avg_abund) {
     tree_var.children = []
     
     for (var i = 0; i < children_copy.length; i++) {
-      var cur_values = get_abunds(abund_vars["10028"], children_copy[i].name);
+      var cur_values = [];
+      for (var group_id in abund_vars) {
+	cur_values.push(get_abunds(abund_vars[group_id], children_copy[i].name)[0]);
+      }
       if (d3.mean(cur_values) >= min_avg_abund) {
 	tree_var.children.push(filter_tree(children_copy[i], min_avg_abund));
       }

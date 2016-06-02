@@ -47,6 +47,7 @@ function doi_update() {
     draw_links(d3.select("#links #group-" + j), links,
 	       abund_vars[group_ids[j]], group_ids[j], scales);
   }
+  draw_text(d3.select("#text"), layout.nodes);
 }
 
 function draw_links(el, links, abunds, group_id, scales) {
@@ -63,7 +64,13 @@ function draw_links(el, links, abunds, group_id, scales) {
     .classed("tree_link", true)
     .style({
       "opacity": 0,
-      "stroke": scales.col(group_id),
+      "stroke": function(d) {
+	var cur_abunds = get_abunds(abunds, d.target.name)
+	if (d3.mean(cur_abunds) == 0) {
+	  return "black";
+	}
+	return scales.col(group_id)
+      },
       "stroke-width": function(d) {
 	var cur_abunds = get_abunds(abunds, d.target.name)
 	return scales.size(d3.mean(cur_abunds));
@@ -71,25 +78,61 @@ function draw_links(el, links, abunds, group_id, scales) {
     })
     .on("click",
 	function(d) {
-	  focus_node_id = d.target.name;
+	  focus_node_id = d.source.name;
 	  doi_update();
 	});
 
-  
-
   links_selection.transition()
-    .duration(700)
+    .duration(1000)
     .attr({"d": function(d) {
       var source = {"x": d.source.x, "y": d.source.y}
       var target = {"x": d.target.x, "y": d.target.y}
       return diagonal({"source": source, "target": target})
     }})
     .style({
-      "opacity": 1,
+      "opacity": .8,
       "stroke-width": function(d) {
 	var cur_abunds = get_abunds(abunds, d.target.name)
 	return scales.size(d3.mean(cur_abunds));
       }});
+}
+
+function draw_text(el, nodes) {
+  var text_selection = el.selectAll(".tree_text")
+      .data(nodes.filter(function(d) { return d.doi >= -1}),
+	    function(d) { return d.name });
+
+  text_selection.exit().remove();
+
+  text_selection.enter()
+    .append("text")
+    .classed("tree_text", true)
+    .style({"opacity": 0});
+
+  text_selection
+    .transition()
+    .duration(1000)
+    .text(function(d) { return d.name })
+    .attr({
+      "x": function(d) {
+	return d.x;
+      },
+      "y": function(d) {
+	return d.y;
+      },
+      "font-size": function(d) {
+	if(d.doi == 0) {
+	  return 12
+	} else {
+	  return 7
+	}}})
+    .style({
+      "opacity":  function(d) {
+	if(d.doi == 0) {
+	  return 1
+	} else {
+	  return .6
+	}}});
 }
 
 function get_matches(names, search_str) {
