@@ -31,7 +31,7 @@ function get_one_ts_pos(bounds, ts_extents, one_ts, series_name) {
   return ts_pos;
 }
 
-function get_ts_bounds(tips, ts_scale, width, padding = 10) {
+function get_ts_bounds(tips, ts_scale, width, padding) {
   start_diff = [];
   for (var i = 1; i < tips.length; i++) {
     start_diff.push(ts_scale.x(tips[i].x) - ts_scale.x(tips[i - 1].x));
@@ -194,7 +194,7 @@ function draw_box_brush(bounds) {
   box_brush = d3.svg.brush()
     .x(x_scale)
     .y(x_scale)
-    .extent([[0, 0], [100, 100]]);
+    .extent([[0, 0], [100, 400]]);
 
   var brush_elem = d3.select("#box_brushes")
       .append("g")

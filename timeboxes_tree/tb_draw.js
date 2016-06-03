@@ -8,7 +8,7 @@ var height = 300,
 var brush_ix = 0;
 
 // underyling visual elements
-var svg_elem = d3.select("body")
+var svg_elem = d3.select("#timebox")
     .append("svg")
     .attr({"width": width,
 	   "height": height});

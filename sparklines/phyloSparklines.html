@@ -1,21 +1,102 @@
 <!DOCTYPE html>
 <title>phyloSparklines</title>
 
-<script type ="text/javascript" src="data/abund.js"></script>
-<script type="text/javascript" src="data/tree.js"></script>
-<script type="text/javascript" src="vis/tree_funs.js"></script>
-<script type="text/javascript" src="vis/ts_funs.js"></script>
+<script type ="text/javascript" src="../data/abund.js"></script>
+<script type="text/javascript" src="../data/tree.js"></script>
+<script type="text/javascript" src="tree_funs.js"></script>
+<script type="text/javascript" src="ts_funs.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
 
-<link type="text/css" rel="stylesheet" href="css/style.css">
+<link type="text/css" rel="stylesheet" href="../css/style.css">
+
+<link rel="stylesheet" href="../css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="https://fonts.googleapis.com/css?family=Roboto">
+
+<style>
+.tree_link {
+  fill: none;
+}
+
+.tree_highlight {
+  fill: none;
+}
+
+.tree_text {
+  font-family: "Roboto"
+}
+
+.label {
+    display: inline-block;
+    width: 50px;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    border: 2px solid white;
+    width: 100px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100px;
+    height: 2px;
+    background: #EDEDED;
+    border: none;
+    border-radius: 2px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background: #454545;
+    margin-top: -3.5px;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]:focus::-ms-fill-lower {
+    background: #ccc;
+}
+input[type=range]:focus::-ms-fill-upper {
+   background: #ccc;
+}
+</style>
+
+<body>
+  <div class="container">
+      <div class="page-header" id="header">
+	<div class="row">
+	  <div class="col-lg-8 col-md-7 col-sm-6">
+	    <h1> Tree Sparklines </h1>
+	    <p class="lead">Time series annotation on trees</p>
+	  </div>
+        </div>
+      </div>
+
+    <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2">
+	<form>
+	  <label for="depthSlider">Agglomeration depth</label>
+	  <input id="depthSlider" type="range" min="0" max="24" value="12" oninput="update_depth()"/>
+	  </form>
+      </div>
+      <div id="canvas_elem" class="col-lg-10 col-md-10 col-sm-10">
+      </div>
+</body>
 
 <div class="row">
-  <input id="depthSlider" type="range" min="0" max="24" value="24" oninput="update_depth()"/>
+
 </div>
 
 <body></body>
-<script type = "text/javascript" src="vis/setup.js"></script>
+<script type = "text/javascript" src="setup.js"></script>
 
 </html>

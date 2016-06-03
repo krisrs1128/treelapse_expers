@@ -154,7 +154,7 @@ function update_phylo(tree, abund, width, height) {
 
   // get postions for tip and box ts
   var tips = get_tips(cur_cluster.nodes);
-  var bounds = get_ts_bounds(tips, scales, .1 * width);
+  var bounds = get_ts_bounds(tips, scales, .1 * width, 10);
   var box_bounds = []
   for (var i = 0; i < tips.length; i++) {
     box_bounds.push({"x_left": 0, "x_right": width, "y_bottom": 0,

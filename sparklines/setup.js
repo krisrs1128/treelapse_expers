@@ -1,9 +1,9 @@
-width = 800;
-height = 1500;
+width = 1000;
+height = 500;
 
 // only worry about one person right now
 abund = parse_times(abund["10032"]);
-svg_elem = d3.select("body")
+svg_elem = d3.select("#canvas_elem")
   .append("svg")
   .attr({"width": width,
 	 "height": height});
