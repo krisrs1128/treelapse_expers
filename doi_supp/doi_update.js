@@ -17,7 +17,7 @@ function doi_update() {
 		.range([.7, 13]),
 	        "col": d3.scale.linear()
 		.domain([-7, 0])
-		.range(["#F88E79", "#3EBFA3"])};
+		.range(["#7A8B8B", "#528B8B"])};
 
   var links = d3.layout.cluster()
     .links(layout.nodes)
@@ -137,9 +137,13 @@ function doi_update() {
 	      var abunds = get_abunds(abund_var, d.target.name); 
 	      return .66 * scales.size(d3.mean(abunds));
 	    },
-	    "stroke": function(d) { return scales.col(d.target.doi) }
-	   });
-
+	    "stroke": function(d) { 
+	      var abunds = get_abunds(abund_var, d.target.name);
+	      if (d3.mean(abunds) == 0) {
+		return "black"
+	      }
+	      return scales.col(d.target.doi)
+	    }});
   node_selection
     .transition()
     .duration(1000)
