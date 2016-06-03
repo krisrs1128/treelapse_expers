@@ -1,3 +1,3 @@
-# phyloSparklines
+# Treelapse
 
-[Here](http://statweb.stanford.edu/~kriss1/phyloSparklines.html) it is.
+[Here](http://krisrs1128.github.io/treelapse_expers/index.html) it is.
