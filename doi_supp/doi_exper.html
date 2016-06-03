@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<title>phyloSparklines</title>
+<title>DOI Trees</title>
 
-<link rel="stylesheet" type="text/css"
-      href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="../css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 <style>
 .tree_link {
@@ -16,19 +17,71 @@
 .tree_text {
   font-family: "Roboto"
 }
+
+.label {
+    display: inline-block;
+    width: 50px;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    border: 2px solid white;
+    width: 100px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100px;
+    height: 2px;
+    background: #EDEDED;
+    border: none;
+    border-radius: 2px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background: #454545;
+    margin-top: -3.5px;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]:focus::-ms-fill-lower {
+    background: #ccc;
+}
+input[type=range]:focus::-ms-fill-upper {
+   background: #ccc;
+}
 </style>
 
 <body>
-<input id="min_doi" type="range" min="-7" max="-1" step=".01" value="-2"/>
-<input id="min_avg_abund" type="range" min="0" max="2" step=".01" value="0"/>
-<input id="node_x" type="range" min=".5" max="20" step=".01" value="20"/>
-<input id="node_y" type="range" min="5" max="70" step=".01" value="40"/>
-<input type="text" id="search_box"><input type="button" id="search" value="search"/>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2">
+	<form>
+	<label for="min_doi">Minimum DOI</label>
+	<input id="min_doi" name="min_doi" type="range" min="-7" max="-1" step=".01" value="-4"/> </br>
+	<label for="min_abund">Minimum Abundance</label>
+	<input id="min_avg_abund" type="range" min="0" max=".5" step=".01" value=".1"/></br>
+	<label for="min_abund">x-spacing</label>
+	<input id="node_x" type="range" min=".5" max="20" step=".01" value="20"/></br>
+	<label for="min_abund">y-spacing</label>
+	<input id="node_y" type="range" min="5" max="70" step=".01" value="40"/></br>
+	<label for="min_abund">Search</label></br>
+	<input style="width: 80px; background: #F0F0F0" type="text" id="search_box">
+	</form>
+      </div>
+      <div class="col-lg-10 col-md-10 col-sm-10" id="canvas_elem"></div>
+    </div>
 </body>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
 <script type="text/javascript" src="../data/tax_tree.js"></script>
 <script type="text/javascript" src="../data/tax_abund.js"></script>
 <script type="text/javascript" src="doi_utils.js"></script>

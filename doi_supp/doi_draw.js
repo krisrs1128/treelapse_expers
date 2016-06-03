@@ -3,7 +3,7 @@
 // are following http://vis.stanford.edu/papers/doitrees-revisited
 //////////////////////////////////////////////////////////////////////
 
-var height = 300,
+var height = 500,
     width = 1000;
 var node_size = [$("#node_x").attr("value"), $("#node_y").attr("value")];
 var min_doi = $("#min_doi").attr("value");
@@ -12,7 +12,7 @@ var tree_var = jQuery.extend(true, {}, tax_tree);
 var abund_var = tax_abund["10101"]
 
 // just draw it for fun
-var svg_elem = d3.select("body")
+var svg_elem = d3.select("#canvas_elem")
   .append("svg")
   .attr({"width": width,
 	 "height": height})
