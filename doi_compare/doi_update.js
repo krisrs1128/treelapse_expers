@@ -22,6 +22,13 @@ function doi_update() {
 	        "col": d3.scale.ordinal()
 		.domain(Object.keys(abund_vars))
 		.range(["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0"])};
+
+  var legend = d3.legend.color()
+      .labels(["CST 1", "CST 2", "CST 3", "CST 4", "CST 5"])
+      .scale(scales.col)
+  d3.selectAll("#legend")
+    .call(legend);
+  
   var links = d3.layout.cluster()
       .links(layout.nodes)
   var diagonal = d3.svg.diagonal()

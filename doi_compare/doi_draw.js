@@ -24,7 +24,7 @@ d3.select("svg")
 
 d3.select("svg")
   .selectAll("g")
-  .data(["highlight-links", "links", "nodes", "text"]).enter()
+  .data(["highlight-links", "links", "nodes", "text", "legend"]).enter()
   .append("g")
   .attr({"id": function(d) { return d; }});
 
