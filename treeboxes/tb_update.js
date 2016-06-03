@@ -55,7 +55,7 @@ function tb_update() {
       }
     })
     .style({"opacity": .4,
-	    "stroke": "#696969",
+	    "stroke": "#C9C9C9",
 	    "stroke-width": function(d) {
 	      return scales.r(d3.mean(abund_var[d.target.name]
 				      .map(function(x) { return x.value;  })))
@@ -70,7 +70,7 @@ function tb_update() {
 	     return scales.r(d3.mean(abund_var[d.name]
 				     .map(function(x) { return x.value;  })))
 	   }})
-    .style({"fill": "#696969"});
+    .style({"fill": "#C9C9C9"});
 
   ts_selection.transition()
     .duration(700)
@@ -93,7 +93,7 @@ function tb_update() {
 	if(cur_lines.indexOf(d) != -1) {
 	  return .9
 	} else {
-	  return .5
+	  return .7
 	}
       }
     });
@@ -105,7 +105,7 @@ function tb_update() {
 	if (cur_lines.indexOf(d.name) != -1) {
 	  return "#2D869F"
 	} else {
-	  return "#696969";
+	  return "#C9C9C9";
 	}
       },
     });

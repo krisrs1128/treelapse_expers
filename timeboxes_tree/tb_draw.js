@@ -3,8 +3,8 @@
 var abund_var = tax_abund["10101"];
 var tree_var = jQuery.extend(true, {}, tax_tree); // deep copy
 var cur_lines = [];
-var height = 300,
-    width = 800
+var height = 350,
+    width = 1000
 var brush_ix = 0;
 
 // underyling visual elements
@@ -20,14 +20,13 @@ d3.select("svg")
 
 d3.select("svg")
   .selectAll("g")
-  .data(["all_ts", "all_brushes", "nodes", "links", "mouseover"]).enter() 
+  .data(["all_ts", "all_brushes", "links", "nodes", "mouseover"]).enter() 
   .append("g")
   .attr({"id": function(d) { return d; }});
 
 d3.select("#mouseover")
   .append("text")
-  .classed("mouseover_text", true)
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
+  .classed("mouseover_text", true);
 
 // get array extents, for scales
 var abund_array = [];
@@ -50,11 +49,6 @@ var nodes = d3.layout.cluster()
     .size([.9 * width, .9 * ((height / 2) - 20)])
     .nodes(tree_var)
 
-d3.select("#nodes")
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
-d3.select("#links")
-  .attr({"transform": "translate(" + .05 * width + ", 20)"});
-
 var links = d3.layout.cluster()
     .links(nodes);
 
@@ -63,13 +57,19 @@ var diagonal = d3.svg.diagonal()
 
 var scales = {"x": d3.scale.linear()
 	      .domain(d3.extent(time_array))
-	      .range([10, width - 10]),
+	      .range([10, width - 65]),
 	      "y": d3.scale.linear()
 	      .domain(d3.extent(abund_array))
 	      .range([height - 15, height / 2]),
 	      "r": d3.scale.linear()
 	      .domain(d3.extent(abund_array))
-	      .range([1, 10])};
+	      .range([1, 10]),
+	      "x_tree": d3.scale.linear()
+	      .domain([0, width])
+	      .range([10, width - 10]),
+	      "y_tree": d3.scale.linear()
+	      .domain([0, height / 2])
+	      .range([20, height / 2 - 20])};
 
 var all_brushes = [];
 var brush_nums = [];

@@ -38,13 +38,13 @@ function tb_update() {
     .classed("tree_link", true)
     .attr({
       "d": function(d) {
-	var source = {"x": d.source.x, "y": d.source.y}
-	var target = {"x": d.target.x, "y": d.target.y}
+	var source = {"x": scales.x_tree(d.source.x), "y": scales.y_tree(d.source.y)}
+	var target = {"x": scales.x_tree(d.target.x), "y": scales.y_tree(d.target.y)}
 	return diagonal({"source": source, "target": target})
       }
     })
     .style({"opacity": .4,
-	    "stroke": "#696969",
+	    "stroke": "#C9C9C9",
 	    "stroke-width": function(d) {
 	      return scales.r(d3.mean(abund_var[d.target.name]
 				      .map(function(x) { return x.value;  })))
@@ -53,19 +53,19 @@ function tb_update() {
   node_selection.enter()
     .append("circle")
     .classed("tree_node", true)
-    .attr({"cx": function(d) { return d.x },
-	   "cy": function(d) { return d.y },
+    .attr({"cx": function(d) { return scales.x_tree(d.x) },
+	   "cy": function(d) { return scales.y_tree(d.y) },
 	   "r": function(d) {
 	     return scales.r(d3.mean(abund_var[d.name]
 				     .map(function(x) { return x.value;  })))
 	   }})
-    .style({"fill": "#696969"})
+    .style({"fill": "#C9C9C9"})
     .on("mouseover",
 	function(d) {
 	  var r = parseFloat(d3.select(this).attr("r"))
 	  d3.select("#mouseover")
-	    .attr({"transform": "translate(" + (d.x + 2 * Math.sqrt(r))+
-		   "," + (d.y - 2 * Math.sqrt(r)) + ")"})
+	    .attr({"transform": "translate(" + (scales.x_tree(d.x) + 2 * Math.sqrt(r))+
+		   "," + (scales.y_tree(d.y) - 2 * Math.sqrt(r)) + ")"})
 	  d3.select("text")
 	    .text(d.name)
 	    .attr({"font-size": 8});
@@ -92,7 +92,7 @@ function tb_update() {
 	if(cur_lines.indexOf(d) != -1) {
 	  return .9
 	} else {
-	  return .5
+	  return .7
 	}
       }
     });
@@ -104,7 +104,7 @@ function tb_update() {
 	if (cur_lines.indexOf(d.name) != -1) {
 	  return "#2D869F"
 	} else {
-	  return "#696969";
+	  return "#C9C9C9";
 	}
       },
     });

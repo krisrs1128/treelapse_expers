@@ -3,8 +3,8 @@
 var abund_var = tax_abund["10101"];
 var tree_var = jQuery.extend(true, {}, tax_tree); // deep copy
 var cur_lines = [];
-var height = 300,
-    width = 920;
+var height = 350,
+    width = 1000;
 var brush_ix = 0;
 
 // underyling visual elements
@@ -20,7 +20,7 @@ d3.select("svg")
 
 d3.select("svg")
   .selectAll("g")
-  .data(["all_ts", "nodes", "links", "all_brushes", "mouseover"]).enter() 
+  .data(["all_ts", "links", "nodes", "all_brushes", "mouseover"]).enter() 
   .append("g")
   .attr({"id": function(d) { return d; }});
 
