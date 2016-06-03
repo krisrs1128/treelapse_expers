@@ -21,8 +21,7 @@ function doi_update() {
 		.range([.6, 12]),
 	        "col": d3.scale.ordinal()
 		.domain(Object.keys(abund_vars))
-		.range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"])};
-
+		.range(["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0"])};
   var links = d3.layout.cluster()
       .links(layout.nodes)
   var diagonal = d3.svg.diagonal()
