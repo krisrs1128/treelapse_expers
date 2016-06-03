@@ -7,73 +7,93 @@
 <link rel="stylesheet" type="text/css"  href="https://fonts.googleapis.com/css?family=Roboto">
 
 <style>
-.tree_link {
+  .tree_link {
   fill: none;
-}
+  }
 
-.tree_highlight {
+  .tree_highlight {
   fill: none;
-}
+  }
 
-.tree_text {
+  .tree_text {
   font-family: "Roboto"
-}
+  }
 
-.label {
-    display: inline-block;
-    width: 50px;
-}
+  .label {
+  display: inline-block;
+  width: 50px;
+  }
 
-input[type=range] {
-    -webkit-appearance: none;
-    border: 2px solid white;
-    width: 100px;
-}
+  input[type=range] {
+  -webkit-appearance: none;
+  border: 2px solid white;
+  width: 100px;
+  }
 
-input[type=range]::-webkit-slider-runnable-track {
-    width: 100px;
-    height: 2px;
-    background: #EDEDED;
-    border: none;
-    border-radius: 2px;
-}
+  input[type=range]::-webkit-slider-runnable-track {
+  width: 100px;
+  height: 2px;
+  background: #EDEDED;
+  border: none;
+  border-radius: 2px;
+  }
 
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    border: none;
-    height: 7px;
-    width: 7px;
-    border-radius: 50%;
-    background: #454545;
-    margin-top: -3.5px;
-}
+  input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: none;
+  height: 7px;
+  width: 7px;
+  border-radius: 50%;
+  background: #454545;
+  margin-top: -3.5px;
+  }
 
-input[type=range]:focus {
-    outline: none;
-}
+  input[type=range]:focus {
+  outline: none;
+  }
 
-input[type=range]:focus::-ms-fill-lower {
-    background: #ccc;
-}
-input[type=range]:focus::-ms-fill-upper {
-   background: #ccc;
-}
+  input[type=range]:focus::-ms-fill-lower {
+  background: #ccc;
+  }
+  input[type=range]:focus::-ms-fill-upper {
+  background: #ccc;
+  }
 </style>
 
 <body>
   <div class="container">
-      <div class="page-header" id="header">
-	<div class="row">
-	  <div class="col-lg-8 col-md-7 col-sm-6">
-	    <h1> Degree-of-Interest Trees </h1>
-	    <p class="lead">Navigation of taxonomic abundances</p>
-	  </div>
-        </div>
-      </div>
-
+    <div class="navbar-collapse collapse" id="navbar-main">
+      <ul class="nav navbar-nav">
+	<li>
+	  <a href="../index.html">Home</a>
+	</li>
+	<li>
+	  <a href="../doi_supp/doi_exper.html">DOI Tree</a>
+	</li>
+	<li>
+	  <a href="../timeboxes_tree/tb_exper.html">Timeboxes</a>
+	</li>
+	<li>
+	  <a href="../treeboxes/tb_exper.html">Treeboxes</a>
+	</li>
+	<li>
+	  <a href="../doi_compare/doi_exper.html">DOI Sankey</a>
+	</li>
+	<li>
+	  <a href="../sparklines/phyloSparklines.html">Sparklines</a>
+	</li>
+      </ul>
+    </div>
     <div class="row">
-      <div class="col-lg-2 col-md-2 col-sm-2">
-	<form>
+      <div class="col-lg-8 col-md-7 col-sm-6">
+	<h2> Degree-of-Interest Trees </h2>
+	<p class="lead">Navigation of taxonomic abundances</p>
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-2">
+      <form>
 	<label for="min_doi">Minimum DOI</label>
 	<input id="min_doi" name="min_doi" type="range" min="-7" max="-1" step=".01" value="-4"/> </br>
 	<label for="min_abund">Minimum Abundance</label>
@@ -84,10 +104,10 @@ input[type=range]:focus::-ms-fill-upper {
 	<input id="node_y" type="range" min="5" max="70" step=".01" value="40"/></br>
 	<label for="min_abund">Search</label></br>
 	<input style="width: 80px; background: #F0F0F0" type="text" id="search_box">
-	</form>
-      </div>
-      <div class="col-lg-10 col-md-10 col-sm-10" id="canvas_elem"></div>
+      </form>
     </div>
+    <div class="col-lg-10 col-md-10 col-sm-10" id="canvas_elem"></div>
+  </div>
 </body>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
