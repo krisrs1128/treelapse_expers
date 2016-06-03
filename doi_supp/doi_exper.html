@@ -88,6 +88,43 @@
       <div class="col-lg-8 col-md-7 col-sm-6">
 	<h2> Degree-of-Interest Trees </h2>
 	<p class="lead">Navigation of taxonomic abundances</p>
+	<p>
+	  The Degree-of-Interest (DOI) Tree technique was proposed by
+	      <blockquote style="font-size:12px">
+		Heer, Jeffrey, and Stuart K. Card. "DOITrees revisited: scalable,
+		space-constrained visualization of hierarchical data." Proceedings of
+		the working conference on Advanced visual interfaces. ACM, 2004. 
+	      </blockquote>
+	      as a principled strategy for laying out and navigating
+	      large trees. The principle is used here for comparing
+	      the abundance between taxonomic groups at varying levels
+	      of locality.
+	      The paper given above describes a number of additional useful
+	      features, like breadcrumbs and symbolic labeling of
+	      hidden subtrees, that have yet to be implemented in this view.
+	</p>
+	<h3> Guide </h3>
+	Clicking on nodes sets them to the highest interest and
+	recenters the screen around them. All ancestors of the
+	focus node are highlighted in purple.
+	The parameters in the left-hand box adjust which nodes are
+	displayed as well as how they are displayed. The minimum DOI
+	slider specifies the degree of locality in the
+	display. Dragging the slider to the left and right give more
+	global and local views, respectively. The minimum abundance
+	slider can be used to filter away nodes that are low
+	abundance; the aggressiveness of the filtering increases as
+	the slider moves to the right.
+	<br>
+	The node y and x-size parameters adjust how much space is
+	allocated to each node in the x and y direction. The smaller
+	the x-sizes are, the more nodes can be displayed on the
+	screen.
+	The gray search box at the bottom allows the user to search for
+	specific taxonomic labels. It highlights in read any paths to
+	nodes that match the query. For example, typing "lach"
+	highlights a path to the Lachnospiraceae family.
+	</p>
       </div>
   </div>
 

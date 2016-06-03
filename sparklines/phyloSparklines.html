@@ -72,7 +72,6 @@ input[type=range]:focus::-ms-fill-upper {
 
 <body>
   <div class="container">
-
       <div class="navbar-collapse collapse" id="navbar-main">
 	<ul class="nav navbar-nav">
 	  <li>
@@ -100,9 +99,39 @@ input[type=range]:focus::-ms-fill-upper {
 	  <div class="col-lg-8 col-md-7 col-sm-6">
 	    <h2> Tree Sparklines </h2>
 	    <p class="lead">Time series annotation on trees</p>
-	  </div>
-      </div>
+	    <p>
+	      Sparklines are miniature time series used to provide
+	      high data-density complements to tables of summary
+	      statistics. They can be found in some financial stocks
+	      pages, for a thorough treatment, refer to
 
+	      <blockquote style="font-size:12px">
+		Tufte, Edward R., and P. R. Graves-Morris. The visual display of quantitative information. Vol. 2. No. 9. Cheshire, CT: Graphics press, 1983.
+	      </blockquote>
+	    </p>
+	    <h3> Guide </h3>
+	    <p>
+	    Each node in this tree corresponds to a taxonomic group,
+	    and leaves are annotated with sparklines giving the
+	    abundance of that class of microbes over time. The brush
+	    at the bottom is a single-brush simplification of
+	    timeboxing. The series in bold always correspond to a leaf
+	    node in bold.
+	    Updating the agglomeration level trims away all nodes
+	    below the associated depth and resizes the tree so it
+	    takes up all the space. The new leaf nodes correspond to
+	    coarser taxonomic subgroups.
+	    Note that unlike all other trees on this site, the
+	    one shown here is a phylogenetic -- not a taxonomic --
+	    tree.
+	    Each sparkline is covered by a brush. Adjusting the region
+	    of the time series covered by this brush updates the node
+	    and edge sizes to reflect average abundances during the
+	    specified the interval.
+	    </p>
+	  </div>
+	</div>
+	<div class="page-header"/div>
     <div class="row">
       <div class="col-lg-2 col-md-2 col-sm-2">
 	<form>

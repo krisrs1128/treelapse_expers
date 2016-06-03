@@ -49,15 +49,48 @@
       <div class="col-lg-8 col-md-7 col-sm-6">
 	<h2> Timebox Trees </h2>
 	<p class="lead">Taxonomic characterization of microbial dynamics.</p>
+	<p>
+	  Timeboxes let the user sketch a visual query incrementally,
+	  in a way that facilitates focus + context data
+	  visualization. The Timebox Trees idea extends this idea to
+	  aid identification associated corresponding taxonomic groups
+	  on a tree. That is, this visualization is the obvious blend of
+	  the ideas described in the following papers,
+	      <blockquote style="font-size:12px">
+		Hochheiser, Harry, and Ben Shneiderman. "Visual
+		queries for finding patterns in time series data."
+		University of Maryland, Computer Science Dept. Tech
+		Report, CS-TR-4365 (2002).
+		Becker, Richard A., and William
+		S. Cleveland. "Brushing scatterplots." Technometrics
+		29.2 (1987): 127-142.
+	      </blockquote>
+	</p>
+	<h3> Guide </h3>
+	<p>
+	Click "New Brush" to create a new timebox over the displayed
+	time series. Clicking this button again creates a new brush;
+	keyboard presses toggle between the timeboxes present on the
+	screen. The highlighted series are those that pass through
+	each timebox. Their corresponding taxonomic group is also
+	highlighted in the tree in the top half of the
+	screen. Hovering over nodes in the tree supplies their
+	taxonomic identity.
+
+	Note that a series is only highlighted if a measured sample (a
+	kink in the line) passes through the timebox. It is not enough
+	for a straight part of the line to pass through the box.
+	</p>
       </div>
   </div>
+    <div class="page-header"/div>
   <div class="row">
       <button onclick="new_brush()">New Brush</button>
       <button onclick="remove_brush()">Remove Brush</button>
+    </div>
+    <div class="row" id="timebox">
+    </div>
   </div>
-  <div class="row" id="timebox">
-  </div>
-</div>
 </body>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>

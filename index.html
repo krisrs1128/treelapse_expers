@@ -29,7 +29,7 @@
       <div class="navbar-collapse collapse" id="navbar-main">
 	<ul class="nav navbar-nav">
 	  <li>
-	    <a href="../index.html">Home</a>
+	    <a href="./index.html">Home</a>
 	  </li>
 	  <li>
 	    <a href="doi_supp/doi_exper.html">DOI Tree</a>
@@ -52,12 +52,64 @@
 	  <div class="col-lg-8 col-md-7 col-sm-6">
 	    <h1> Treelapse </h1>
 	    <p class="lead">Visualization of Microbial Dynamics</p>
+
+	    <p> 
+	    Modern microbiome studies often revolve around the dynamics of and
+	    differences between microbial communities. For example,
+	    what is the behavior of the microbiome after a treatment
+	    of antibiotics, or do microbial signatures differ between
+	    treatment and control groups. Interpretation of these
+	    complex data have inspired various statistical methods,
+	    but the potential for informative data visualization in
+	    this domain has remained relatively unexplored. In
+	    Treelapse (like timelapses, but for trees), we adapt
+	    methods developed in the data visualization research
+	    literature in order to study microbial dynamics.
+	    </p>
+
+	    <h2> Data </h2>
+	    <p> The data used in these visualization experiments come
+	    from the study,</p> 
+
+	    <blockquote style="font-size:12px">
+	      DiGiulio, Daniel B., et al. "Temporal and spatial
+	      variation of the human microbiota during pregnancy."
+	      Proceedings of the National Academy of Sciences 112.35
+	      (2015): 11060-11065.
+	    </blockquote>
+	    which can be
+	    obtained <a href="http://statweb.stanford.edu/~susan/papers/PNASRR.html">here</a>.
+
+	    In the DOI tree, Timeboxes, and Treeboxes views give the
+	    abundances for the vaginal site in subject 10101. Node
+	    sizes and edge widths represent abundances averaged across
+	    all timepoints. In the DOI Sankey, we average samples
+	    for each of
+	    the <a href="http://statweb.stanford.edu/~susan/papers/Pregnancy/PNAS_Vaginal_Analysis.html">CSTs</a>
+	    identified in this study. In the sparklines example, we
+	    use data from subject 10032.
+
+	    In the future, we plan on making these techniques
+	    applicable to generic data sets through an 
+	    an <a href="http://www.htmlwidgets.org/">htmlwidgets</a>
+	    interface
+	    to <a href="https://joey711.github.io/phyloseq/">phyloseq</a>.
+
+	    <h2> About </h2>
+	    <p>
+	      These visual experiments are only preliminary, and this
+	      project remains under active development. All code is
+	      publically available
+	      on <a href="https://github.com/krisrs1128/treelapse_expers">
+	      github</a>. For questions, please
+	      contact <a href="mailto:kriss1@stanford.edU">Kris
+	      Sankaran</a>. More resources for microbiome data
+	      analysis can be found
+	      the <a href="http://statweb.stanford.edu/~susan/LAB/">Holmes
+	      lab website</a>.
+	    </p>
 	  </div>
         </div>
-      <div class="page-header">
-	<h2 id="about">About</h2>
-      </div>
-
     </div>
   </body>
 </html>

@@ -89,13 +89,36 @@
       <div class="col-lg-8 col-md-7 col-sm-6">
 	<h2> Degree-of-Interest Sankey </h2>
 	<p class="lead">Comparison of taxonomic abundances</p>
+	    <p>
+	      The DOI Sankey is a slight modification of the standard
+	      DOI idea to the case in which multiple trees with the
+	      same topology must be compared. It facilitates visual
+	      comparisons similar to, but simpler than, those in 
+	      <blockquote style="font-size:12px">
+		Gomez, John Alexis Guerra, et al. "TreeVersity: Comparing tree structures by topology and node's attributes differences." Visual Analytics Science and Technology (VAST), 2011 IEEE Conference on. IEEE, 2011.
+	      </blockquote>
+	    </p>
+	    <h3> Guide </h3>
+	<p>
+	  All the DOI parameters on the side are the same as those in
+	  the single tree DOI experiment, though search has not been
+	  implemented in this version. Clicking on links focuses
+	  attention at the taxonomic group at the end of the
+	  link. Each color is associated with a different CST, with
+	  widths proportional to average abundance in that
+	  CST. So, regions of the tree with more of one type of color
+	  correspond to species that are more abundant in one CST
+	  compared to the others.
+	</p>
       </div>
   </div>
 
-  <div class="row">
+    <div class="page-header"/div>
+      <div class="row">
     <div class="col-lg-2 col-md-2 col-sm-2">
       <form>
 	<label for="min_doi">Minimum DOI</label>
+
 	<input id="min_doi" name="min_doi" type="range" min="-7" max="-1" step=".01" value="-4"/> </br>
 	<label for="min_abund">Minimum Abundance</label>
 	<input id="min_avg_abund" type="range" min="0" max=".5" step=".01" value=".1"/></br>
